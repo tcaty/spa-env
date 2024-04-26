@@ -68,6 +68,8 @@ to quickly create a Cobra application.`,
 		}
 
 		fmt.Println(envFilePath)
+
+		// TODO: run command from args
 	},
 }
 
