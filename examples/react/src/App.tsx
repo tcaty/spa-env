@@ -25,6 +25,15 @@ function App() {
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
       </div>
+      <hr />
+      <h2>Env variables</h2>
+      <p>
+        VITE_API_URL = {import.meta.env.VITE_API_URL}
+      </p>
+      <p>
+        VITE_SECRECT_TOKEN = {import.meta.env.VITE_SECRECT_TOKEN}
+      </p>
+      <hr />
       <p className="read-the-docs">
         Click on the Vite and React logos to learn more
       </p>
