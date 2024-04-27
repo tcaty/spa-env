@@ -19,6 +19,7 @@ type InitFlags struct {
 	EnvPrefix string
 }
 
+// TODO: rename to replace
 var initFlags InitFlags
 
 // initCmd represents the init command
@@ -76,6 +77,7 @@ to quickly create a Cobra application.`,
 func init() {
 	initCmd.PersistentFlags().StringVarP(&initFlags.WorkDir, "workdir", "", "", "Path to working directory")
 	initCmd.PersistentFlags().StringVarP(&initFlags.EnvFile, "env-file", "", ".env", "Name of .env file")
+	// TODO: replace to "use-prefix"
 	initCmd.PersistentFlags().StringVarP(&initFlags.EnvPrefix, "env-prefix", "", "NEXT_PUBLIC_", "Prefix to env variables")
 
 	initCmd.MarkPersistentFlagRequired("workdir")
