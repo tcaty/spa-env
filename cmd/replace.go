@@ -13,18 +13,17 @@ import (
 	"github.com/tcaty/spa-entrypoint/internal/file"
 )
 
-type InitFlags struct {
-	WorkDir   string
-	EnvFile   string
-	EnvPrefix string
+type ReplaceFlags struct {
+	WorkDir string
+	EnvFile string
 }
 
 // TODO: rename to replace
-var initFlags InitFlags
+var replaceFlags ReplaceFlags
 
-// initCmd represents the init command
-var initCmd = &cobra.Command{
-	Use:   "init",
+// replaceCmd represents the replace command
+var replaceCmd = &cobra.Command{
+	Use:   "replace",
 	Short: "A brief description of your command",
 	Long: `A longer description that spans multiple lines and likely contains examples
 and usage of using your command. For example:
@@ -33,21 +32,21 @@ Cobra is a CLI library for Go that empowers applications.
 This application is a tool to generate the needed files
 to quickly create a Cobra application.`,
 	Run: func(cmd *cobra.Command, args []string) {
-		if _, err := os.Stat(initFlags.WorkDir); err != nil {
+		if _, err := os.Stat(replaceFlags.WorkDir); err != nil {
 			log.Fatalf("error occured while reading workdir: %v", err)
 		}
 
-		envFilePath, err := file.Find(initFlags.WorkDir, initFlags.EnvFile)
+		envFilePath, err := file.Find(replaceFlags.WorkDir, replaceFlags.EnvFile)
 		if err != nil {
 			log.Fatalf("error occured while finding .env file: %v", err)
 		}
 
 		envMap, err := env.MapEnvFileToActualEnv(envFilePath)
 		if err != nil {
-			log.Fatalf("error occured while reading .env file: %v", err)
+			log.Fatalf("error occured while mapping .env file to env: %v", err)
 		}
 
-		err = filepath.WalkDir(initFlags.WorkDir, func(path string, d fs.DirEntry, err error) error {
+		err = filepath.WalkDir(replaceFlags.WorkDir, func(path string, d fs.DirEntry, err error) error {
 			if err != nil {
 				return fmt.Errorf("prevent panic by handling failure accessing a path %q: %v", path, err)
 			}
@@ -75,10 +74,8 @@ to quickly create a Cobra application.`,
 }
 
 func init() {
-	initCmd.PersistentFlags().StringVarP(&initFlags.WorkDir, "workdir", "", "", "Path to working directory")
-	initCmd.PersistentFlags().StringVarP(&initFlags.EnvFile, "env-file", "", ".env", "Name of .env file")
-	// TODO: replace to "use-prefix"
-	initCmd.PersistentFlags().StringVarP(&initFlags.EnvPrefix, "env-prefix", "", "NEXT_PUBLIC_", "Prefix to env variables")
+	replaceCmd.PersistentFlags().StringVarP(&replaceFlags.WorkDir, "workdir", "", "", "Path to working directory")
+	replaceCmd.PersistentFlags().StringVarP(&replaceFlags.EnvFile, "env-file", "", ".env", "Name of .env file")
 
-	initCmd.MarkPersistentFlagRequired("workdir")
+	replaceCmd.MarkPersistentFlagRequired("workdir")
 }

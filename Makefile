@@ -8,6 +8,6 @@ restore:
 .PHONY: dev
 dev:
 	source data/.env && \
-	go run main.go init \
+	go run main.go replace \
 		--workdir data/app \
 		--env-file .env.production

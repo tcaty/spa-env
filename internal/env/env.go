@@ -2,31 +2,28 @@ package env
 
 import (
 	"fmt"
-	"log/slog"
 	"os"
 
 	"github.com/joho/godotenv"
 )
 
-// TODO: add docs with examples
+// Map .env file to actual environment, return error
+// if variable specified in file, but missed in current env
 func MapEnvFileToActualEnv(path string) (map[string]string, error) {
-	env, err := godotenv.Read(path)
+	dotenv, err := godotenv.Read(path)
 	if err != nil {
 		return nil, fmt.Errorf("error occured while reading .env file: %v", err)
 	}
 
 	res := make(map[string]string)
 
-	for k, v := range env {
-		envVar := os.Getenv(v)
+	for k, v := range dotenv {
+		env := os.Getenv(v)
 
-		if envVar == "" {
-			slog.Warn(
-				"variable specified in file, but not specefied in current env",
-				"var", k,
-			)
+		if env == "" {
+			return nil, fmt.Errorf("env variable %s specified in .env file, but not found in environment", k)
 		} else {
-			res[v] = envVar
+			res[v] = env
 		}
 
 	}
