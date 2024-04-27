@@ -5,6 +5,7 @@ import (
 	"io/fs"
 	"log"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 
@@ -18,19 +19,11 @@ type ReplaceFlags struct {
 	EnvFile string
 }
 
-// TODO: rename to replace
 var replaceFlags ReplaceFlags
 
-// replaceCmd represents the replace command
 var replaceCmd = &cobra.Command{
 	Use:   "replace",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
+	Short: "Replace static env values from .env by values from actual env",
 	Run: func(cmd *cobra.Command, args []string) {
 		if _, err := os.Stat(replaceFlags.WorkDir); err != nil {
 			log.Fatalf("error occured while reading workdir: %v", err)
@@ -67,9 +60,14 @@ to quickly create a Cobra application.`,
 			log.Fatalf("error occured in main logic: %v", err)
 		}
 
-		fmt.Println(envFilePath)
-
-		// TODO: run command from args
+		// use args like shell commmand if they were passed
+		if len(args) > 0 {
+			shell := os.Getenv("SHELL")
+			cmd := exec.Command(shell, "-c", strings.Join(args, " "))
+			if err := cmd.Run(); err != nil {
+				log.Fatalf("error occured while runnig: %v", err)
+			}
+		}
 	},
 }
 

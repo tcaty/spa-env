@@ -49,12 +49,14 @@ func Replace(path string, replaceRules map[string]string) error {
 	for old, new := range replaceRules {
 		newContent = strings.ReplaceAll(newContent, old, new)
 		// TODO: add flag "verbose" to hide this logs
-		slog.Info(
-			"successfull replace",
-			"path", path,
-			"from", old,
-			"to", new,
-		)
+		if false {
+			slog.Info(
+				"successfull replace",
+				"path", path,
+				"from", old,
+				"to", new,
+			)
+		}
 	}
 
 	if err := os.WriteFile(path, []byte(newContent), 0); err != nil {

@@ -29,6 +29,8 @@ func Execute() {
 }
 
 func init() {
+	// TODO: generate - generate .env file for prod based on .env.dev
+	// TODO: validate - validate code for env usage
 	rootCmd.AddCommand(replaceCmd)
 
 	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
