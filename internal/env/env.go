@@ -9,7 +9,7 @@ import (
 
 // Map .env file to actual environment, return error
 // if variable specified in file, but missed in current env
-func MapEnvFileToActualEnv(path string) (map[string]string, error) {
+func MapDotenvToActualEnv(path string) (map[string]string, error) {
 	dotenv, err := godotenv.Read(path)
 	if err != nil {
 		return nil, fmt.Errorf("error occured while reading .env file: %v", err)

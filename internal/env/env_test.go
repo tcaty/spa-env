@@ -7,17 +7,17 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestMapEnvFileToActualEnv(t *testing.T) {
+func TestMapDotenvToActualEnv(t *testing.T) {
 	testCases := []struct {
 		name         string
-		envFileData  string
+		dotenvData   string
 		actualEnv    map[string]string
 		excpectedMap map[string]string
 		fail         bool
 	}{
 		{
 			name: "Valid dotenv file",
-			envFileData: `
+			dotenvData: `
 VITE_API_URL=API_URL
 VITE_SECRET_TOKEN=SECRET_TOKEN
 			`,
@@ -31,8 +31,8 @@ VITE_SECRET_TOKEN=SECRET_TOKEN
 			},
 		},
 		{
-			name:        "Env variable specified in dotenv file but missed in env",
-			envFileData: "VITE_SECRET_TOKEN=SECRET_TOKEN",
+			name:       "Env variable specified in dotenv file but missed in env",
+			dotenvData: "VITE_SECRET_TOKEN=SECRET_TOKEN",
 			actualEnv: map[string]string{
 				"API_URL": "https://api.com/",
 			},
@@ -43,9 +43,9 @@ VITE_SECRET_TOKEN=SECRET_TOKEN
 			fail: true,
 		},
 		{
-			name:        "Empty actual env",
-			envFileData: "VITE_API_URL=API_URL",
-			fail:        true,
+			name:       "Empty actual env",
+			dotenvData: "VITE_API_URL=API_URL",
+			fail:       true,
 		},
 	}
 
@@ -55,10 +55,10 @@ VITE_SECRET_TOKEN=SECRET_TOKEN
 		t.Run(tc.name, func(t *testing.T) {
 			path := "/tmp/.env"
 
-			prepareEnvFile(t, path, []byte(tc.envFileData))
+			prepareDotenv(t, path, []byte(tc.dotenvData))
 			prepareEnv(t, tc.actualEnv)
 
-			envMap, err := MapEnvFileToActualEnv(path)
+			envMap, err := MapDotenvToActualEnv(path)
 			if !tc.fail {
 				require.NoError(t, err)
 			}
@@ -70,7 +70,7 @@ VITE_SECRET_TOKEN=SECRET_TOKEN
 	}
 }
 
-func prepareEnvFile(t *testing.T, path string, data []byte) {
+func prepareDotenv(t *testing.T, path string, data []byte) {
 	t.Cleanup(func() {
 		os.Remove(path)
 	})

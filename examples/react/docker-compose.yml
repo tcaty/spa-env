@@ -1,0 +1,15 @@
+version: "3"
+  
+# TODO: add comments
+services:
+  client:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    command: --cmd "npx serve -s dist -l 3000"
+    restart: unless-stopped
+    environment:
+      API_URL: "https://api.com/"
+      SECRET_TOKEN: "54321"
+    ports:
+      - "3000:3000"

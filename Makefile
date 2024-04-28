@@ -1,5 +1,7 @@
 SHELL := /bin/bash
 
+IMAGE=tcaty/spa-env
+
 .PHONY: restore
 restore:
 	rm -rf data/app
@@ -10,12 +12,17 @@ replace:
 	source data/.env && \
 	go run main.go replace \
 		--workdir data/app \
-		--env-file .env.production 
+		--dotenv .env.production 
 
-.PHONY: entrypoint
-entrypoint:
+.PHONY: cmd
+cmd:
 	source data/.env && \
 	go run main.go replace \
 		--workdir data/app \
-		--env-file .env.production \
-		sleep 10
+		--dotenv .env.production \
+		--cmd "while true; do echo 1; sleep 1; done"
+		
+.PHONY: deploy 
+deploy:
+	docker build -t ${IMAGE} . && docker push ${IMAGE}
+	
