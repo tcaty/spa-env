@@ -20,7 +20,8 @@ cmd:
 	go run main.go replace \
 		--workdir data/app \
 		--dotenv .env.production \
-		--cmd "while true; do echo 1; sleep 1; done"
+		--cmd "while true; do echo 1; sleep 1; done" \
+		--form shell
 		
 .PHONY: deploy 
 deploy:
