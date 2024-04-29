@@ -14,7 +14,7 @@ import (
 // Form replacement rules by parsing dotenv file and actual env
 // Then recursively walk through files in workdir
 // and replace env variables by formed rules
-func Replace(workdir string, dotenv string) error {
+func Replace(workdir string, dotenv string, verbose bool) error {
 	if _, err := os.Stat(workdir); err != nil {
 		return fmt.Errorf("error occured while reading workdir: %v", err)
 	}
@@ -40,7 +40,7 @@ func Replace(workdir string, dotenv string) error {
 			return nil
 		}
 
-		if err := file.Replace(path, rules); err != nil {
+		if err := file.Replace(path, rules, verbose); err != nil {
 			return fmt.Errorf("error occured while replacing file content: %v", err)
 		}
 

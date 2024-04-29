@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"log"
+	"time"
 
 	"github.com/spf13/cobra"
 	"github.com/tcaty/spa-entrypoint/internal/replace"
@@ -14,6 +15,7 @@ type ReplaceFlags struct {
 	Dotenv  string
 	Cmd     string
 	Form    string
+	Verbose bool
 }
 
 var replaceFlags ReplaceFlags
@@ -33,9 +35,15 @@ var replaceCmd = &cobra.Command{
 		}
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		if err := replace.Replace(replaceFlags.Workdir, replaceFlags.Dotenv); err != nil {
+		start := time.Now()
+		log.Println("Starting environment variables replacement...")
+
+		if err := replace.Replace(replaceFlags.Workdir, replaceFlags.Dotenv, replaceFlags.Verbose); err != nil {
 			log.Fatalf("error while replacing: %v", err)
 		}
+
+		elapsed := time.Since(start)
+		log.Printf("Replacement completed successfully in %s\n", elapsed)
 
 		if replaceFlags.Cmd != "" {
 			cmd, err := command.Parse(replaceFlags.Cmd, replaceFlags.Form)
@@ -51,10 +59,11 @@ var replaceCmd = &cobra.Command{
 }
 
 func init() {
-	replaceCmd.PersistentFlags().StringVarP(&replaceFlags.Workdir, "workdir", "", "", "Path to working directory")
-	replaceCmd.PersistentFlags().StringVarP(&replaceFlags.Dotenv, "dotenv", "", ".env", "Name of .env file")
-	replaceCmd.PersistentFlags().StringVarP(&replaceFlags.Cmd, "cmd", "", "", "Command to execute after replacement")
-	replaceCmd.PersistentFlags().StringVarP(&replaceFlags.Form, "form", "", command.ExecForm, "Form in which command from --cmd will be run")
+	replaceCmd.PersistentFlags().StringVarP(&replaceFlags.Workdir, "workdir", "w", "", "Path to working directory")
+	replaceCmd.PersistentFlags().StringVarP(&replaceFlags.Dotenv, "dotenv", "d", ".env", "Name of .env file not path. It will be found automatically in workdir")
+	replaceCmd.PersistentFlags().StringVarP(&replaceFlags.Cmd, "cmd", "c", "", "Command to execute after replacement")
+	replaceCmd.PersistentFlags().StringVarP(&replaceFlags.Form, "form", "f", command.ExecForm, "Form in which command from --cmd will be run")
+	replaceCmd.PersistentFlags().BoolVarP(&replaceFlags.Verbose, "verbose", "v", false, "Enable verbose logs")
 
 	replaceCmd.MarkPersistentFlagRequired("workdir")
 }

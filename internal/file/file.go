@@ -3,7 +3,7 @@ package file
 import (
 	"fmt"
 	"io/fs"
-	"log/slog"
+	"log"
 	"os"
 	"path/filepath"
 	"strings"
@@ -39,7 +39,7 @@ func Find(wordkir string, filenameSubstr string) (string, error) {
 }
 
 // Replace old substring to new string in file located on specified path
-func Replace(path string, rules map[string]string) error {
+func Replace(path string, rules map[string]string, verbose bool) error {
 	read, err := os.ReadFile(path)
 	if err != nil {
 		return fmt.Errorf("error occured while reading file: %v", err)
@@ -48,13 +48,10 @@ func Replace(path string, rules map[string]string) error {
 	newContent := string(read)
 	for old, new := range rules {
 		newContent = strings.ReplaceAll(newContent, old, new)
-		// TODO: add flag "verbose" to hide this logs
-		if false {
-			slog.Info(
-				"successfull replace",
-				"path", path,
-				"from", old,
-				"to", new,
+		if verbose {
+			log.Printf(
+				"successfull replace path=%s, old=%s, new=%s",
+				path, old, new,
 			)
 		}
 	}
