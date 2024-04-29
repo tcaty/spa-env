@@ -1,11 +1,17 @@
 version: "3"
   
-# TODO: add comments
 services:
   client:
     build: 
       context: .
       dockerfile: Dockerfile
+    # pass command to run after replacement
+    # make sure that command is in qoutes, otherwise in this case
+    # spa-env will fail with "unknown shorthand flag: 's' in -s" error
+    #
+    # right: --cmd "npx serve -s dist -l 3000"
+    # wrong: --cmd npx serve -s dist -l 3000
+    #
     command: --cmd "npx serve -s dist -l 3000"
     restart: unless-stopped
     environment:

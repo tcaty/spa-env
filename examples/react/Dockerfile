@@ -25,4 +25,8 @@ COPY .env.production ./dist
 
 RUN yarn add serve --silent
 
-ENTRYPOINT [ "/spa-env", "replace", "--workdir", "/usr/src/react/dist", "--dotenv", ".env.production" ]
+ENTRYPOINT [ \
+    "/spa-env", "replace", \
+    "--workdir", "/usr/src/react/dist", \
+    "--dotenv", ".env.production" \
+]
