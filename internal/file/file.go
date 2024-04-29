@@ -45,18 +45,25 @@ func Replace(path string, rules map[string]string, verbose bool) error {
 		return fmt.Errorf("error occured while reading file: %v", err)
 	}
 
-	newContent := string(read)
+	content := string(read)
+
 	for old, new := range rules {
-		newContent = strings.ReplaceAll(newContent, old, new)
+		// skip if replacement isn't needed
+		if !strings.Contains(content, old) {
+			continue
+		}
+
+		content = strings.ReplaceAll(content, old, new)
+
 		if verbose {
 			log.Printf(
-				"successfull replace path=%s, old=%s, new=%s",
+				"successfull replace path=%s old=%s new=%s\n",
 				path, old, new,
 			)
 		}
 	}
 
-	if err := os.WriteFile(path, []byte(newContent), 0); err != nil {
+	if err := os.WriteFile(path, []byte(content), 0); err != nil {
 		return fmt.Errorf("error occured while writing file: %v", err)
 	}
 
