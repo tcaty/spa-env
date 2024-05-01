@@ -23,7 +23,7 @@ So, the main idea is that variables that refer on environment variables are repl
 ### `spa-env` working steps 
 1. this tool automatically finds `.env` file in `workdir` by filename
 2. further it parses `key=placeholder` pairs where `key` has specified `prefix` from `.env` file
-3. further `spa-env` parses pairs `placeholder=value` from actual environment
+3. further `spa-env` parses pairs `placeholder=value` from actual environment, for example, from docker container
 4. in the end it simply replaces `placeholder` by `value` in all files from `workdir` except `.env` file  
 
 ## Usage
