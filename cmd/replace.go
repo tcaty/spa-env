@@ -13,6 +13,7 @@ import (
 type ReplaceFlags struct {
 	Workdir string
 	Dotenv  string
+	Prefix  string
 	Cmd     string
 	Form    string
 	Verbose bool
@@ -38,7 +39,8 @@ var replaceCmd = &cobra.Command{
 		start := time.Now()
 		log.Println("Starting environment variables replacement...")
 
-		if err := replace.Replace(replaceFlags.Workdir, replaceFlags.Dotenv, replaceFlags.Verbose); err != nil {
+		err := replace.Replace(replaceFlags.Workdir, replaceFlags.Dotenv, replaceFlags.Prefix, replaceFlags.Verbose)
+		if err != nil {
 			log.Fatalf("error while replacing: %v", err)
 		}
 
@@ -61,6 +63,7 @@ var replaceCmd = &cobra.Command{
 func init() {
 	replaceCmd.PersistentFlags().StringVarP(&replaceFlags.Workdir, "workdir", "w", "", "Path to working directory")
 	replaceCmd.PersistentFlags().StringVarP(&replaceFlags.Dotenv, "dotenv", "d", ".env", "Name of .env file not path. It will be found automatically in workdir")
+	replaceCmd.PersistentFlags().StringVarP(&replaceFlags.Prefix, "prefix", "p", "", "Env variable prefix that will be parsed and replaced")
 	replaceCmd.PersistentFlags().StringVarP(&replaceFlags.Cmd, "cmd", "c", "", "Command to execute after replacement")
 	replaceCmd.PersistentFlags().StringVarP(&replaceFlags.Form, "form", "f", command.ExecForm, "Form in which command from --cmd will be run")
 	replaceCmd.PersistentFlags().BoolVarP(&replaceFlags.Verbose, "verbose", "v", false, "Enable verbose logs")

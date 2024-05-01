@@ -12,7 +12,7 @@ import (
 // Find file by workdir and filename substring
 // Return relative path to file and no error
 // Or return empty string and ErrNotExist if file wasn't found
-func Find(wordkir string, filenameSubstr string) (string, error) {
+func Find(wordkir string, filename string) (string, error) {
 	var path string
 
 	err := filepath.WalkDir(wordkir, func(p string, d fs.DirEntry, err error) error {
@@ -20,8 +20,9 @@ func Find(wordkir string, filenameSubstr string) (string, error) {
 			return fmt.Errorf("prevent panic by handling failure accessing a path %q: %v", p, err)
 		}
 
-		if strings.Contains(p, filenameSubstr) {
+		if !d.IsDir() && d.Name() == filename {
 			path = p
+			return filepath.SkipAll
 		}
 
 		return nil

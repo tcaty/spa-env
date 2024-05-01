@@ -2,6 +2,7 @@ package env
 
 import (
 	"os"
+	"reflect"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -11,6 +12,7 @@ func TestMapDotenvToActualEnv(t *testing.T) {
 	testCases := []struct {
 		name         string
 		dotenvData   string
+		prefix       string
 		actualEnv    map[string]string
 		excpectedMap map[string]string
 		fail         bool
@@ -47,6 +49,24 @@ VITE_SECRET_TOKEN=SECRET_TOKEN
 			dotenvData: "VITE_API_URL=API_URL",
 			fail:       true,
 		},
+		{
+			name: "Use env prefix",
+			dotenvData: `
+POSTGRES_CONN_STRING=POSTGRES_CONN_STRING
+NEXT_PUBLIC_API_URL=API_URL
+NEXT_PUBLIC_TOKEN=SECRET_TOKEN
+			`,
+			prefix: "NEXT_PUBLIC",
+			actualEnv: map[string]string{
+				"POSTGRES_CONN_STRING": "postgres://username:password@localhost:5432/database",
+				"API_URL":              "https://api.com/",
+				"SECRET_TOKEN":         "12345",
+			},
+			excpectedMap: map[string]string{
+				"API_URL":      "https://api.com/",
+				"SECRET_TOKEN": "12345",
+			},
+		},
 	}
 
 	for _, tc := range testCases {
@@ -58,13 +78,13 @@ VITE_SECRET_TOKEN=SECRET_TOKEN
 			prepareDotenv(t, path, []byte(tc.dotenvData))
 			prepareEnv(t, tc.actualEnv)
 
-			envMap, err := MapDotenvToActualEnv(path)
+			envMap, err := MapDotenvToActualEnv(path, tc.prefix, false)
 			if !tc.fail {
 				require.NoError(t, err)
 			}
 
-			for k := range tc.excpectedMap {
-				require.Equal(t, tc.excpectedMap[k], envMap[k])
+			if !tc.fail && !reflect.DeepEqual(tc.excpectedMap, envMap) {
+				require.Failf(t, "Maps should be equal", "Maps aren't equal \nExpected: %#v \nActual: %#v", tc.excpectedMap, envMap)
 			}
 		})
 	}

@@ -12,6 +12,7 @@ services:
     # wrong: --cmd node server.js
     #
     command: >
+      --prefix NEXT_PUBLIC
       --cmd "node server.js"
       --verbose
     restart: unless-stopped
