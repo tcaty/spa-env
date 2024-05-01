@@ -4,7 +4,7 @@ Have you ever tried to use environment variables in single page applications at 
 
 ## How does it work?
 
-### Environment varialbes in spa
+### Environment variables in spa
 
 First of all there is a little note about environment variables in spa. Imagine that we have `app.js` file with code above:
 ```
