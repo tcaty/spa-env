@@ -1,6 +1,6 @@
 # spa-env
 
-Have you ever tried to use runtime environment variables in single page applications? There are several ways to do it, however almost all of them are too slow, too unsafe or have redundant complexity. So, `spa-env` is fast, reliable and simple solution of this problem.
+Have you ever tried to use environment variables in single page applications at browser runtime? There are several ways to do it, however almost all of them are too slow, too unsafe or have redundant complexity. So, `spa-env` is fast, reliable and simple solution of this problem.
 
 ## How does it work?
 
@@ -18,7 +18,7 @@ As you've noticed we'll use `vite` to build this application. After running `yar
 ```
 console.log("https://api.com/")
 ```
-So, the main idea is that variables that refer on environment variables are replaced by static values at build time.
+So, the main idea is that variables that refer on environment variables are replaced by static values at buildtime.
 
 ### `spa-env` working steps 
 1. this tool automatically finds `.env` file in `workdir` by filename
