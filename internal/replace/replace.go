@@ -35,8 +35,13 @@ func Replace(workdir string, dotenv string, verbose bool) error {
 			return fmt.Errorf("prevent panic by handling failure accessing a path %q: %v", path, err)
 		}
 
-		// skip unnecessary files
-		if strings.Contains(path, "node_modules") || filepath.Ext(path) != ".js" {
+		// skip entire node_modules directory
+		if d.IsDir() && d.Name() == "node_modules" {
+			return filepath.SkipDir
+		}
+
+		// skip directories paths and dotenv file
+		if d.IsDir() || strings.Contains(path, dotenv) {
 			return nil
 		}
 

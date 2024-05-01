@@ -1,0 +1,25 @@
+version: "3"
+  
+services:
+  client:
+    build: 
+      context: .
+      dockerfile: Dockerfile
+    # pass command to run after replacement
+    # make sure that command is in qoutes
+    #
+    # right: --cmd "node server.js"
+    # wrong: --cmd node server.js
+    #
+    command: >
+      --cmd "node server.js"
+      --verbose
+    restart: unless-stopped
+    environment:
+      # server variables
+      POSTGRES_CONN_STRING: "postgres://username:password@prod.server:5432/database"
+      # client variables
+      API_URL: "https://api.com/"
+      SECRET_TOKEN: "54321"
+    ports:
+      - "3000:3000"

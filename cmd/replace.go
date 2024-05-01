@@ -43,7 +43,7 @@ var replaceCmd = &cobra.Command{
 		}
 
 		elapsed := time.Since(start)
-		log.Printf("Replacement completed successfully in %s\n", elapsed)
+		log.Printf("Replacement completed successfully in %s\n\n", elapsed)
 
 		if replaceFlags.Cmd != "" {
 			cmd, err := command.Parse(replaceFlags.Cmd, replaceFlags.Form)

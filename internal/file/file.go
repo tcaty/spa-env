@@ -40,20 +40,21 @@ func Find(wordkir string, filenameSubstr string) (string, error) {
 
 // Replace old substring to new string in file located on specified path
 func Replace(path string, rules map[string]string, verbose bool) error {
-	read, err := os.ReadFile(path)
+	bytes, err := os.ReadFile(path)
 	if err != nil {
 		return fmt.Errorf("error occured while reading file: %v", err)
 	}
 
-	content := string(read)
+	oldContent := string(bytes)
+	newContent := oldContent
 
 	for old, new := range rules {
 		// skip if replacement isn't needed
-		if !strings.Contains(content, old) {
+		if !strings.Contains(newContent, old) {
 			continue
 		}
 
-		content = strings.ReplaceAll(content, old, new)
+		newContent = strings.ReplaceAll(newContent, old, new)
 
 		if verbose {
 			log.Printf(
@@ -63,7 +64,12 @@ func Replace(path string, rules map[string]string, verbose bool) error {
 		}
 	}
 
-	if err := os.WriteFile(path, []byte(content), 0); err != nil {
+	// prevent writing if there were no changes in content
+	if oldContent == newContent {
+		return nil
+	}
+
+	if err := os.WriteFile(path, []byte(newContent), 0); err != nil {
 		return fmt.Errorf("error occured while writing file: %v", err)
 	}
 
