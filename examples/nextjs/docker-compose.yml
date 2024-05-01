@@ -5,6 +5,9 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
+    # in this example prefix is specified
+    # it prevents replacement of server side env variables
+    # 
     # pass command to run after replacement
     # make sure that command is in qoutes
     #

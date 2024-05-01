@@ -6,8 +6,8 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/tcaty/spa-entrypoint/internal/replace"
-	"github.com/tcaty/spa-entrypoint/pkg/command"
+	"github.com/tcaty/spa-env/internal/replace"
+	"github.com/tcaty/spa-env/pkg/command"
 )
 
 type ReplaceFlags struct {
@@ -23,7 +23,8 @@ var replaceFlags ReplaceFlags
 
 var replaceCmd = &cobra.Command{
 	Use:   "replace",
-	Short: "Replace static env values from .env by values from actual env",
+	Short: "Run replace command",
+	Long:  "This commmand replaces static env values from .env by values from actual environment",
 	Args: func(cmd *cobra.Command, args []string) error {
 		switch replaceFlags.Form {
 		case command.ShellForm, command.ExecForm:

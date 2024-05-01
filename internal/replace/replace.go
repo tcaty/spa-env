@@ -7,8 +7,8 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/tcaty/spa-entrypoint/internal/env"
-	"github.com/tcaty/spa-entrypoint/internal/file"
+	"github.com/tcaty/spa-env/internal/env"
+	"github.com/tcaty/spa-env/internal/file"
 )
 
 // Form replacement rules by parsing dotenv file and actual env

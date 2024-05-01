@@ -1,6 +1,6 @@
 package main
 
-import "github.com/tcaty/spa-entrypoint/cmd"
+import "github.com/tcaty/spa-env/cmd"
 
 func main() {
 	cmd.Execute()

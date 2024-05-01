@@ -8,7 +8,7 @@ import (
 	"os/exec"
 	"strings"
 
-	"github.com/tcaty/spa-entrypoint/pkg/shell"
+	"github.com/tcaty/spa-env/pkg/shell"
 )
 
 const (

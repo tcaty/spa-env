@@ -6,19 +6,10 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// rootCmd represents the base command when called without any subcommands
 var rootCmd = &cobra.Command{
 	Use:   "spa-env",
-	Short: "A brief description of your application",
-	Long: `A longer description that spans multiple lines and likely contains
-examples and usage of using your application. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	// Run: func(cmd *cobra.Command, args []string) { },
+	Short: "Run spa-env",
+	Long:  "spa-env is a set of different useful utils that helps to work with environment variables in spa",
 }
 
 func Execute() {
@@ -29,9 +20,7 @@ func Execute() {
 }
 
 func init() {
-	// TODO: generate - generate .env file for prod based on .env.dev
-	// TODO: validate - validate code for env usage
+	// TODO: generate - generate .env file for production based on .env.development
+	// TODO: validate - validate code for environment variables usage
 	rootCmd.AddCommand(replaceCmd)
-
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
 }

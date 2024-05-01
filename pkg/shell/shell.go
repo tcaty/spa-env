@@ -5,7 +5,7 @@ import (
 	"os"
 	"os/user"
 
-	"github.com/tcaty/spa-entrypoint/pkg/passwd"
+	"github.com/tcaty/spa-env/pkg/passwd"
 )
 
 // Find shell absolute path for current user

@@ -1,3 +1,5 @@
+# TODO: refactor this file
+
 SHELL := /bin/bash
 
 IMAGE=tcaty/spa-env
@@ -21,7 +23,8 @@ cmd:
 		--workdir data/app \
 		--dotenv .env.production \
 		--cmd "while true; do echo 1; sleep 1; done" \
-		--form shell
+		--form shell \
+		--verbose
 		
 .PHONY: deploy 
 deploy:
