@@ -60,14 +60,24 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # so we don't have to do it manually unlike in react example
 COPY --from=tcaty/spa-env /spa-env /spa-env
 
+ENV HOSTNAME="0.0.0.0" \
+    PORT="3000"
+    
 USER nextjs
 
 EXPOSE 3000
 
-ENV PORT 3000
-
 ENTRYPOINT [ \
+    # execute binary
     "/spa-env", "replace", \
+    # specify workdir where built project is placed
     "--workdir", "/app", \
-    "--dotenv", ".env.production" \
+    # specify name of .env file for production mode
+    "--dotenv", ".env.production", \
+    # specify environment variables prefix which will be replaced
+    # variables without this prefix won't be affected
+    "--prefix", "NEXT_PUBLIC", \
+    # specify command which will be run after successfull replacement
+    # notice, that command runs in exec form (default behaivour)
+    "--cmd", "node server.js" \
 ]

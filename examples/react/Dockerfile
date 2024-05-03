@@ -26,8 +26,10 @@ COPY .env.production ./dist
 
 RUN yarn add serve --silent
 
-ENV HOST="0.0.0.0" \
+ENV HOSTNAME="0.0.0.0" \
     PORT="3000"
+    
+EXPOSE 3000
 
 ENTRYPOINT [ \
     # execute binary
@@ -37,9 +39,9 @@ ENTRYPOINT [ \
     # specify name of .env file for production mode
     "--dotenv", ".env.production", \
     # specify command which will be run after successfull replacement
-    "--cmd", "npx serve -s dist -l tcp://$HOST:$PORT", \
+    "--cmd", "npx serve -s dist -l tcp://$HOSTNAME:$PORT", \
     # specify in which form command will be run
-    # as you can see, command above uses environment variables $HOST and $PORT
+    # as you can see, command above uses environment variables $HOSTNAME and $PORT
     # therefore, it has to be run in shell form (by default command runs in exec form)
     "--form", "shell" \
 ]

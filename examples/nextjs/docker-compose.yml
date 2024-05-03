@@ -5,19 +5,7 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-    # in this example prefix is specified
-    # it prevents replacement of server side env variables
-    # 
-    # pass command to run after replacement
-    # make sure that command is in qoutes
-    #
-    # right: --cmd "node server.js"
-    # wrong: --cmd node server.js
-    #
-    command: >
-      --prefix NEXT_PUBLIC
-      --cmd "node server.js"
-      --verbose
+    command: --verbose
     restart: unless-stopped
     environment:
       # server variables
