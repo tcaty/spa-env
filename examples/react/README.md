@@ -6,6 +6,14 @@ This is simple example. Please, pay attention to these files:
 * `Dockerfile` - the place to use `spa-env`.
 * `docker-compose.yml` - the place to configure environment variables `placeholder=value`.
 
+## Running
+
+To run this example just execute command below:
+```
+docker-compose up -d
+```
+And checkout `http://0.0.0.0:3000` in your browser.
+
 ## Usage
 
 ### Run `spa-env`
