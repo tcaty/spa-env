@@ -69,5 +69,7 @@ func init() {
 	replaceCmd.PersistentFlags().StringVarP(&replaceFlags.Form, "form", "f", command.ExecForm, "Form in which command from --cmd will be run")
 	replaceCmd.PersistentFlags().BoolVarP(&replaceFlags.Verbose, "verbose", "v", false, "Enable verbose logs")
 
-	replaceCmd.MarkPersistentFlagRequired("workdir")
+	if err := replaceCmd.MarkPersistentFlagRequired("workdir"); err != nil {
+		return
+	}
 }

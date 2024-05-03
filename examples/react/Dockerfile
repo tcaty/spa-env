@@ -25,8 +25,13 @@ COPY .env.production ./dist
 
 RUN yarn add serve --silent
 
+ENV HOST="0.0.0.0" \
+    PORT="3000"
+
 ENTRYPOINT [ \
     "/spa-env", "replace", \
     "--workdir", "/usr/src/react/dist", \
-    "--dotenv", ".env.production" \
+    "--dotenv", ".env.production", \
+    "--cmd", "npx serve -s dist -l tcp://$HOST:$PORT", \
+    "--form", "shell" \
 ]

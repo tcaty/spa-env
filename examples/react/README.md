@@ -1,3 +1,2 @@
 # React + TypeScript + Vite example
 
-
