@@ -60,16 +60,17 @@ COPY --from=tcaty/spa-env /spa-env /spa-env
 ENTRYPOINT [ \
     "/spa-env", "replace", \
     "--workdir", "/app", \
-    "--dotenv", ".env.production" \
+    "--dotenv", ".env.production", \
     "--prefix", "NEXT_PUBLIC", \
     "--cmd", "node server.js", \
     "--verbose" \
 ]
 
 ```
+Further just pass environment variables without prefix `NEXT_PUBLIC` to container and verify successfull replacement by looking at the container logs.
 
 ## Examples
 
 There are two available examples in `examples` folder:
-* nextjs - simple nextjs app
-* react - simple react app with vite
+* [nextjs](examples/nextjs/README.md) - simple nextjs app
+* [react](examples/react/README.md) - simple react app with vite
