@@ -65,7 +65,6 @@ ENTRYPOINT [ \
     "--cmd", "node server.js", \
     "--verbose" \
 ]
-
 ```
 Further just pass environment variables without prefix `NEXT_PUBLIC` to container and verify successfull replacement by looking at the container logs.
 
