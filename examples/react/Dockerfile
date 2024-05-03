@@ -42,6 +42,6 @@ ENTRYPOINT [ \
     "--cmd", "npx serve -s dist -l tcp://$HOSTNAME:$PORT", \
     # specify in which form command will be run
     # as you can see, command above uses environment variables $HOSTNAME and $PORT
-    # therefore, it has to be run in shell form (by default command runs in exec form)
+    # therefore, it must be run in shell form (by default command runs in exec form)
     "--form", "shell" \
 ]

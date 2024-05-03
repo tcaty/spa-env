@@ -55,7 +55,7 @@ RUN chown nextjs:nodejs .next
 # https://nextjs.org/docs/advanced-features/output-file-tracing
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-# -- copy spa-env binary from official image
+# copy spa-env binary from official image
 # notice that next copies .env file to dist automatically
 # so we don't have to do it manually unlike in react example
 COPY --from=tcaty/spa-env /spa-env /spa-env

@@ -21,7 +21,7 @@ And checkout `http://0.0.0.0:3000` in your browser.
 You could find detailed description of `spa-env` usage in `Dockerfile`. 
 
 > [!WARNING]
-> Vite doesn't copy `.env.production` file to dist automatically. So it has to be copied manually, see `Dockerfile` for more details.
+> Vite doesn't copy `.env.production` file to dist automatically. So it must be copied manually, see `Dockerfile` for more details.
 
 ### Environment variables
 
