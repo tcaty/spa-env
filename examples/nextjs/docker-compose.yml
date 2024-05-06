@@ -7,11 +7,6 @@ services:
       dockerfile: Dockerfile
     command: --verbose
     restart: unless-stopped
-    environment:
-      # server side variables
-      POSTGRES_CONN_STRING: "postgres://username:password@prod.server:5432/database"
-      # client side variables
-      API_URL: "https://api.com/"
-      SECRET_TOKEN: "54321"
+    env_file: .env
     ports:
       - "3000:3000"
