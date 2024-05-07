@@ -3,10 +3,11 @@ package file
 import (
 	"fmt"
 	"io/fs"
-	"log"
 	"os"
 	"path/filepath"
 	"strings"
+
+	"github.com/tcaty/spa-env/internal/log"
 )
 
 // Find file by workdir and filename substring
@@ -39,8 +40,8 @@ func Find(wordkir string, filename string) (string, error) {
 	return path, nil
 }
 
-// Replace old substring to new string in file located on specified path
-func Replace(path string, rules map[string]string, verbose bool) error {
+// Replace placeholder by value in file located on specified path
+func ReplaceContent(path string, rules map[string]string) error {
 	bytes, err := os.ReadFile(path)
 	if err != nil {
 		return fmt.Errorf("error occured while reading file: %v", err)
@@ -49,20 +50,20 @@ func Replace(path string, rules map[string]string, verbose bool) error {
 	oldContent := string(bytes)
 	newContent := oldContent
 
-	for old, new := range rules {
+	for placeholder, value := range rules {
 		// skip if replacement isn't needed
-		if !strings.Contains(newContent, old) {
+		if !strings.Contains(newContent, placeholder) {
 			continue
 		}
 
-		newContent = strings.ReplaceAll(newContent, old, new)
+		newContent = strings.ReplaceAll(newContent, placeholder, value)
 
-		if verbose {
-			log.Printf(
-				"successfull replace path=%s old=%s new=%s\n",
-				path, old, new,
-			)
-		}
+		log.Debug(
+			"successful replacement",
+			"path", path,
+			"placeholder", placeholder,
+			"value", value,
+		)
 	}
 
 	// prevent writing if there were no changes in content

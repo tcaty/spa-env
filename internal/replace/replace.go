@@ -14,7 +14,7 @@ import (
 // Form replacement rules by parsing dotenv file and actual env
 // Then recursively walk through files in workdir
 // and replace env variables by formed rules
-func Replace(workdir string, dotenv string, prefix string, verbose bool) error {
+func Replace(workdir string, dotenv string, prefix string) error {
 	if _, err := os.Stat(workdir); err != nil {
 		return fmt.Errorf("error occured while reading workdir: %v", err)
 	}
@@ -25,7 +25,7 @@ func Replace(workdir string, dotenv string, prefix string, verbose bool) error {
 	}
 
 	// form replacement rules
-	rules, err := env.MapDotenvToActualEnv(dotenvPath, prefix, verbose)
+	rules, err := env.MapDotenvToActualEnv(dotenvPath, prefix)
 	if err != nil {
 		return fmt.Errorf("error occured while mapping .env file to env: %v", err)
 	}
@@ -45,7 +45,7 @@ func Replace(workdir string, dotenv string, prefix string, verbose bool) error {
 			return nil
 		}
 
-		if err := file.Replace(path, rules, verbose); err != nil {
+		if err := file.ReplaceContent(path, rules); err != nil {
 			return fmt.Errorf("error occured while replacing file content: %v", err)
 		}
 

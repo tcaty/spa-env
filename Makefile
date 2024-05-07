@@ -22,19 +22,21 @@ restore:
 
 .PHONY: nextjs
 nextjs:
-	./scripts/use-env.sh ${NEXTJS}/.env && \
+	export $(shell grep -v '^#' ${NEXTJS}/.env | xargs -d '\n') && \
 	go run main.go replace \
 		--workdir ${NEXTJS}/.next \
 		--dotenv .env.production \
+		--prefix NEXT_PUBLIC \
 		--cmd "while true; do echo 1; sleep 1; done" \
 		--form shell \
-		--verbose
+		--log-level DEBUG
 
 .PHONY: react
 react:
-	./scripts/use-env.sh ${REACT}/.env && \
+	export $(shell grep -v '^#' ${REACT}/.env | xargs -d '\n') && \
 	go run main.go replace \
 		--workdir ${REACT}/dist \
 		--dotenv .env.production \
 		--cmd "echo react" \
-		--verbose
+		--log-level DEBUG
+	

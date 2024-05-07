@@ -79,3 +79,15 @@ func printOutput(r io.Reader, w io.Writer) {
 		}
 	}()
 }
+
+func ValidateForm(form string) error {
+	switch form {
+	case ShellForm, ExecForm:
+		return nil
+	default:
+		return fmt.Errorf(
+			"form validation failed: expected %s or %s, but got %s",
+			ShellForm, ExecForm, form,
+		)
+	}
+}

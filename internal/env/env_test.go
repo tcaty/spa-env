@@ -6,6 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
+	"github.com/tcaty/spa-env/internal/log"
 )
 
 func TestMapDotenvToActualEnv(t *testing.T) {
@@ -71,6 +72,8 @@ NEXT_PUBLIC_TOKEN=SECRET_TOKEN
 
 	for _, tc := range testCases {
 		tc := tc
+		// hide logs
+		log.Init(log.LogLevelDebug, true)
 
 		t.Run(tc.name, func(t *testing.T) {
 			path := "/tmp/.env"
@@ -78,7 +81,7 @@ NEXT_PUBLIC_TOKEN=SECRET_TOKEN
 			prepareDotenv(t, path, []byte(tc.dotenvData))
 			prepareEnv(t, tc.actualEnv)
 
-			envMap, err := MapDotenvToActualEnv(path, tc.prefix, false)
+			envMap, err := MapDotenvToActualEnv(path, tc.prefix)
 			if !tc.fail {
 				require.NoError(t, err)
 			}
