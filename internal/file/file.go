@@ -41,10 +41,11 @@ func Find(wordkir string, filename string) (string, error) {
 }
 
 // Replace placeholder by value in file located on specified path
-func ReplaceContent(path string, rules map[string]string) error {
+// Return true and no error if file was successfully updated
+func ReplaceContent(path string, rules map[string]string) (bool, error) {
 	bytes, err := os.ReadFile(path)
 	if err != nil {
-		return fmt.Errorf("error occured while reading file: %v", err)
+		return false, fmt.Errorf("error occured while reading file: %v", err)
 	}
 
 	oldContent := string(bytes)
@@ -68,12 +69,12 @@ func ReplaceContent(path string, rules map[string]string) error {
 
 	// prevent writing if there were no changes in content
 	if oldContent == newContent {
-		return nil
+		return false, nil
 	}
 
 	if err := os.WriteFile(path, []byte(newContent), 0); err != nil {
-		return fmt.Errorf("error occured while writing file: %v", err)
+		return false, fmt.Errorf("error occured while writing file: %v", err)
 	}
 
-	return nil
+	return true, nil
 }

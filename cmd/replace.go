@@ -40,13 +40,17 @@ var replaceCmd = &cobra.Command{
 		start := time.Now()
 		log.Info("Starting environment variables replacement...")
 
-		err := replace.Replace(replaceFlags.Workdir, replaceFlags.Dotenv, replaceFlags.Prefix)
+		filesUpdated, err := replace.Replace(replaceFlags.Workdir, replaceFlags.Dotenv, replaceFlags.Prefix)
 		if err != nil {
 			log.Fatal("error occured while replacing", err)
 		}
 
 		duration := time.Since(start)
-		log.Info("Replacement completed successfully", "duration", duration)
+		log.Info(
+			"Replacement completed successfully",
+			"duration", duration,
+			"files_updated", filesUpdated,
+		)
 
 		if replaceFlags.Cmd != "" {
 			cmd, err := command.Parse(replaceFlags.Cmd, replaceFlags.Form)
