@@ -31,7 +31,7 @@ function App() {
         api_url = {import.meta.env.VITE_API_URL}
       </p>
       <p>
-        secret_token = {import.meta.env.VITE_SECRECT_TOKEN}
+        secret_token = {import.meta.env.VITE_SECRET_TOKEN}
       </p>
       <hr />
       <p className="read-the-docs">

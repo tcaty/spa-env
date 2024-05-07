@@ -2,21 +2,21 @@ package cmd
 
 import (
 	"fmt"
-	"log"
 	"time"
 
 	"github.com/spf13/cobra"
+	"github.com/tcaty/spa-env/internal/log"
 	"github.com/tcaty/spa-env/internal/replace"
 	"github.com/tcaty/spa-env/pkg/command"
 )
 
 type ReplaceFlags struct {
-	Workdir string
-	Dotenv  string
-	Prefix  string
-	Cmd     string
-	Form    string
-	Verbose bool
+	Workdir  string
+	Dotenv   string
+	Prefix   string
+	Cmd      string
+	Form     string
+	LogLevel string
 }
 
 var replaceFlags ReplaceFlags
@@ -26,36 +26,40 @@ var replaceCmd = &cobra.Command{
 	Short: "Run replace command",
 	Long:  "This commmand replaces static env values from .env by values from actual environment",
 	Args: func(cmd *cobra.Command, args []string) error {
-		switch replaceFlags.Form {
-		case command.ShellForm, command.ExecForm:
-			return nil
-		default:
-			return fmt.Errorf(
-				"flags validation failed [--form]: wrong cmd form: expected %s or %s, but got %s",
-				command.ShellForm, command.ExecForm, replaceFlags.Form,
-			)
+		if err := command.ValidateForm(replaceFlags.Form); err != nil {
+			return fmt.Errorf("--form validation failed: %v", err)
 		}
+		if err := log.ValidateLogLevel(replaceFlags.LogLevel); err != nil {
+			return fmt.Errorf("--log-level validation failed: %v", err)
+		}
+		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
-		start := time.Now()
-		log.Println("Starting environment variables replacement...")
+		log.Init(replaceFlags.LogLevel, false)
 
-		err := replace.Replace(replaceFlags.Workdir, replaceFlags.Dotenv, replaceFlags.Prefix, replaceFlags.Verbose)
+		start := time.Now()
+		log.Info("Starting environment variables replacement...")
+
+		filesUpdated, err := replace.Replace(replaceFlags.Workdir, replaceFlags.Dotenv, replaceFlags.Prefix)
 		if err != nil {
-			log.Fatalf("error while replacing: %v", err)
+			log.Fatal("error occured while replacing", err)
 		}
 
-		elapsed := time.Since(start)
-		log.Printf("Replacement completed successfully in %s\n\n", elapsed)
+		duration := time.Since(start)
+		log.Info(
+			"Replacement completed successfully",
+			"duration", duration,
+			"files_updated", filesUpdated,
+		)
 
 		if replaceFlags.Cmd != "" {
 			cmd, err := command.Parse(replaceFlags.Cmd, replaceFlags.Form)
 			if err != nil {
-				log.Fatalf("unable to parse cmd: %v", err)
+				log.Fatal("unable to parse cmd", err)
 			}
 
 			if err := command.Run(cmd); err != nil {
-				log.Fatalf("error occured while running cmd: %v", err)
+				log.Fatal("error occured while running cmd", err)
 			}
 		}
 	},
@@ -67,7 +71,7 @@ func init() {
 	replaceCmd.PersistentFlags().StringVarP(&replaceFlags.Prefix, "prefix", "p", "", "Env variable prefix that will be parsed and replaced")
 	replaceCmd.PersistentFlags().StringVarP(&replaceFlags.Cmd, "cmd", "c", "", "Command to execute after replacement")
 	replaceCmd.PersistentFlags().StringVarP(&replaceFlags.Form, "form", "f", command.ExecForm, "Form in which command from --cmd will be run")
-	replaceCmd.PersistentFlags().BoolVarP(&replaceFlags.Verbose, "verbose", "v", false, "Enable verbose logs")
+	replaceCmd.PersistentFlags().StringVarP(&replaceFlags.LogLevel, "log-level", "l", log.LogLevelInfo, "Log level")
 
 	if err := replaceCmd.MarkPersistentFlagRequired("workdir"); err != nil {
 		return
