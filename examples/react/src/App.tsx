@@ -28,10 +28,10 @@ function App() {
       <hr />
       <h2>Env variables</h2>
       <p>
-        api_url = {import.meta.env.VITE_API_URL}
+        api_url = {`"${import.meta.env.VITE_API_URL}"`}
       </p>
       <p>
-        secret_token = {import.meta.env.VITE_SECRET_TOKEN}
+        secret_token = {`"'${import.meta.env.VITE_SECRET_TOKEN}'"`}
       </p>
       <hr />
       <p className="read-the-docs">

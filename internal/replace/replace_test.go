@@ -1,4 +1,4 @@
-package env
+package replace
 
 import (
 	"os"
@@ -9,14 +9,15 @@ import (
 	"github.com/tcaty/spa-env/internal/log"
 )
 
-func TestMapDotenvToActualEnv(t *testing.T) {
+func TestMapPlaceholderToValue(t *testing.T) {
 	testCases := []struct {
-		name         string
-		dotenvData   string
-		prefix       string
-		actualEnv    map[string]string
-		excpectedMap map[string]string
-		fail         bool
+		name              string
+		dotenvData        string
+		keyPrefix         string
+		placeholderPrefix string
+		actualEnv         map[string]string
+		excpectedMap      map[string]string
+		fail              bool
 	}{
 		{
 			name: "Valid dotenv file",
@@ -51,13 +52,13 @@ VITE_SECRET_TOKEN=SECRET_TOKEN
 			fail:       true,
 		},
 		{
-			name: "Use env prefix",
+			name: "Use env keyPrefix",
 			dotenvData: `
 POSTGRES_CONN_STRING=POSTGRES_CONN_STRING
 NEXT_PUBLIC_API_URL=API_URL
 NEXT_PUBLIC_TOKEN=SECRET_TOKEN
 			`,
-			prefix: "NEXT_PUBLIC",
+			keyPrefix: "NEXT_PUBLIC",
 			actualEnv: map[string]string{
 				"POSTGRES_CONN_STRING": "postgres://username:password@localhost:5432/database",
 				"API_URL":              "https://api.com/",
@@ -66,6 +67,25 @@ NEXT_PUBLIC_TOKEN=SECRET_TOKEN
 			excpectedMap: map[string]string{
 				"API_URL":      "https://api.com/",
 				"SECRET_TOKEN": "12345",
+			},
+		},
+		{
+			name: "Use env keyPrefix and placeholderPrefix",
+			dotenvData: `
+POSTGRES_CONN_STRING=PLACEHOLDER_POSTGRES_CONN_STRING
+NEXT_PUBLIC_API_URL=PLACEHOLDER_API_URL
+NEXT_PUBLIC_SECRET_TOKEN=PLACEHOLDER_SECRET_TOKEN
+			`,
+			keyPrefix:         "NEXT_PUBLIC",
+			placeholderPrefix: "PLACEHOLDER",
+			actualEnv: map[string]string{
+				"POSTGRES_CONN_STRING": "postgres://username:password@localhost:5432/database",
+				"API_URL":              "https://api.com/",
+				"SECRET_TOKEN":         "12345",
+			},
+			excpectedMap: map[string]string{
+				"PLACEHOLDER_API_URL":      "https://api.com/",
+				"PLACEHOLDER_SECRET_TOKEN": "12345",
 			},
 		},
 	}
@@ -81,7 +101,7 @@ NEXT_PUBLIC_TOKEN=SECRET_TOKEN
 			prepareDotenv(t, path, []byte(tc.dotenvData))
 			prepareEnv(t, tc.actualEnv)
 
-			envMap, err := MapDotenvToActualEnv(path, tc.prefix)
+			envMap, err := mapPlaceholderToValue(path, tc.keyPrefix, tc.placeholderPrefix)
 			if !tc.fail {
 				require.NoError(t, err)
 			}

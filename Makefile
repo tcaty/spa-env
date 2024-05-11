@@ -26,9 +26,10 @@ nextjs:
 	go run main.go replace \
 		--workdir ${NEXTJS}/.next \
 		--dotenv .env.production \
-		--prefix NEXT_PUBLIC \
+		--key-prefix NEXT_PUBLIC \
+		--placeholder-prefix PLACEHOLDER \
 		--cmd "while true; do echo 1; sleep 1; done" \
-		--form shell \
+		--cmd-form shell \
 		--log-level DEBUG
 
 .PHONY: react
@@ -37,6 +38,7 @@ react:
 	go run main.go replace \
 		--workdir ${REACT}/dist \
 		--dotenv .env.production \
+		--placeholder-prefix PLACEHOLDER \
 		--cmd "echo react" \
 		--log-level DEBUG
 	

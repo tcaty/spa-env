@@ -56,7 +56,7 @@ COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 # copy spa-env binary from official image
 # notice that next copies .env file to dist automatically
 # so we don't have to do it manually unlike in react example
-COPY --from=tcaty/spa-env:v1.0.1 /spa-env /spa-env
+COPY --from=tcaty/spa-env /spa-env /spa-env
 
 ENV HOSTNAME="0.0.0.0" \
     PORT="3000"
@@ -74,7 +74,10 @@ ENTRYPOINT [ \
     "--dotenv", ".env.production", \
     # specify environment variables prefix which will be replaced
     # variables without this prefix won't be affected
-    "--prefix", "NEXT_PUBLIC", \
+    "--key-prefix", "NEXT_PUBLIC", \
+    # specify placeholder prefix to replace
+    # values without this prefix won't be replaced
+    "--placeholder-prefix", "PLACEHOLDER", \
     # specify command which will be run after successfull replacement
     # notice, that command runs in exec form (default behaivour)
     "--cmd", "node server.js" \
