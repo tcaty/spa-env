@@ -5,7 +5,7 @@ services:
     build: 
       context: .
       dockerfile: Dockerfile
-    command: --verbose
+    command: --log-level DEBUG
     restart: unless-stopped
     env_file: .env
     ports:

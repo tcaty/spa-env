@@ -18,7 +18,7 @@ WORKDIR /usr/src/react
 # copy static files
 COPY --from=build /usr/src/react/dist dist/
 # copy spa-env binary from official image
-COPY --from=tcaty/spa-env /spa-env /spa-env
+COPY --from=tcaty/spa-env:v1.0.1 /spa-env /spa-env
 # WARNING: 
 # vite doesn't copy .env file to dist by default
 # you should copy it manually

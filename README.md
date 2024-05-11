@@ -63,7 +63,7 @@ ENTRYPOINT [ \
     "--dotenv", ".env.production", \
     "--prefix", "NEXT_PUBLIC", \
     "--cmd", "node server.js", \
-    "--verbose" \
+    "--log-level", "DEBUG" \
 ]
 ```
 Further just pass environment variables without prefix `NEXT_PUBLIC` to container and verify successfull replacement by looking at the container logs.
