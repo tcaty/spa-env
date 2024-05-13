@@ -12,19 +12,19 @@ import (
 func TestMapPlaceholderToValue(t *testing.T) {
 	testCases := []struct {
 		name              string
-		dotenvData        string
 		keyPrefix         string
 		placeholderPrefix string
+		dotenvContent     map[string]string
 		actualEnv         map[string]string
 		excpectedMap      map[string]string
-		fail              bool
+		err               error
 	}{
 		{
-			name: "Valid dotenv file",
-			dotenvData: `
-VITE_API_URL=API_URL
-VITE_SECRET_TOKEN=SECRET_TOKEN
-			`,
+			name: "Valid case without prefixes",
+			dotenvContent: map[string]string{
+				"VITE_API_URL":      "API_URL",
+				"VITE_SECRET_TOKEN": "SECRET_TOKEN",
+			},
 			actualEnv: map[string]string{
 				"API_URL":      "https://api.com/",
 				"SECRET_TOKEN": "12345",
@@ -35,30 +35,13 @@ VITE_SECRET_TOKEN=SECRET_TOKEN
 			},
 		},
 		{
-			name:       "Env variable specified in dotenv file but missed in env",
-			dotenvData: "VITE_SECRET_TOKEN=SECRET_TOKEN",
-			actualEnv: map[string]string{
-				"API_URL": "https://api.com/",
-			},
-			fail: true,
-		},
-		{
-			name: "Empty .env file",
-			fail: true,
-		},
-		{
-			name:       "Empty actual env",
-			dotenvData: "VITE_API_URL=API_URL",
-			fail:       true,
-		},
-		{
-			name: "Use env keyPrefix",
-			dotenvData: `
-POSTGRES_CONN_STRING=POSTGRES_CONN_STRING
-NEXT_PUBLIC_API_URL=API_URL
-NEXT_PUBLIC_TOKEN=SECRET_TOKEN
-			`,
+			name:      "Valid case with keyPrefix",
 			keyPrefix: "NEXT_PUBLIC",
+			dotenvContent: map[string]string{
+				"POSTGRES_CONN_STRING": "POSTGRES_CONN_STRING",
+				"NEXT_PUBLIC_API_URL":  "API_URL",
+				"NEXT_PUBLIC_TOKEN":    "SECRET_TOKEN",
+			},
 			actualEnv: map[string]string{
 				"POSTGRES_CONN_STRING": "postgres://username:password@localhost:5432/database",
 				"API_URL":              "https://api.com/",
@@ -70,14 +53,30 @@ NEXT_PUBLIC_TOKEN=SECRET_TOKEN
 			},
 		},
 		{
-			name: "Use env keyPrefix and placeholderPrefix",
-			dotenvData: `
-POSTGRES_CONN_STRING=PLACEHOLDER_POSTGRES_CONN_STRING
-NEXT_PUBLIC_API_URL=PLACEHOLDER_API_URL
-NEXT_PUBLIC_SECRET_TOKEN=PLACEHOLDER_SECRET_TOKEN
-			`,
+			name:              "Valid case with placeholderPrefix",
+			placeholderPrefix: "PLACEHOLDER",
+			dotenvContent: map[string]string{
+				"API_URL":      "PLACEHOLDER_API_URL",
+				"SECRET_TOKEN": "PLACEHOLDER_SECRET_TOKEN",
+			},
+			actualEnv: map[string]string{
+				"API_URL":      "https://api.com/",
+				"SECRET_TOKEN": "12345",
+			},
+			excpectedMap: map[string]string{
+				"PLACEHOLDER_API_URL":      "https://api.com/",
+				"PLACEHOLDER_SECRET_TOKEN": "12345",
+			},
+		},
+		{
+			name:              "Valid case with keyPrefix and placeholderPrefix",
 			keyPrefix:         "NEXT_PUBLIC",
 			placeholderPrefix: "PLACEHOLDER",
+			dotenvContent: map[string]string{
+				"POSTGRES_CONN_STRING":     "PLACEHOLDER_POSTGRES_CONN_STRING",
+				"NEXT_PUBLIC_API_URL":      "PLACEHOLDER_API_URL",
+				"NEXT_PUBLIC_SECRET_TOKEN": "PLACEHOLDER_SECRET_TOKEN",
+			},
 			actualEnv: map[string]string{
 				"POSTGRES_CONN_STRING": "postgres://username:password@localhost:5432/database",
 				"API_URL":              "https://api.com/",
@@ -88,6 +87,42 @@ NEXT_PUBLIC_SECRET_TOKEN=PLACEHOLDER_SECRET_TOKEN
 				"PLACEHOLDER_SECRET_TOKEN": "12345",
 			},
 		},
+		{
+			name:          "Valid case with empty dotenv",
+			dotenvContent: make(map[string]string),
+			actualEnv: map[string]string{
+				"API_URL":      "https://api.com/",
+				"SECRET_TOKEN": "12345",
+			},
+			excpectedMap: make(map[string]string),
+		},
+		{
+			name: "Invalid case with missed variable in actual env without prefixes",
+			dotenvContent: map[string]string{
+				"VITE_API_URL":      "API_URL",
+				"VITE_SECRET_TOKEN": "SECRET_TOKEN",
+			},
+			actualEnv: map[string]string{
+				// missed variable
+				// "API_URL":      "https://api.com/",
+				"SECRET_TOKEN": "12345",
+			},
+			err: errMissedVariable,
+		},
+		{
+			name: "Invalid case with missed variable in actual env caused by missed placeholderPrefix",
+			// missed placeholder prefix
+			// placeholderPrefix: "PLACEHOLDER",
+			dotenvContent: map[string]string{
+				"VITE_API_URL":      "PLACEHOLDER_API_URL",
+				"VITE_SECRET_TOKEN": "PLACEHOLDER_SECRET_TOKEN",
+			},
+			actualEnv: map[string]string{
+				"API_URL":      "https://api.com/",
+				"SECRET_TOKEN": "12345",
+			},
+			err: errMissedVariable,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -96,33 +131,21 @@ NEXT_PUBLIC_SECRET_TOKEN=PLACEHOLDER_SECRET_TOKEN
 		log.Init(log.LogLevelDebug, true)
 
 		t.Run(tc.name, func(t *testing.T) {
-			path := "/tmp/.env"
-
-			prepareDotenv(t, path, []byte(tc.dotenvData))
 			prepareEnv(t, tc.actualEnv)
 
-			envMap, err := mapPlaceholderToValue(path, tc.keyPrefix, tc.placeholderPrefix)
-			if !tc.fail {
+			actualMap, err := mapPlaceholderToValue(tc.dotenvContent, tc.keyPrefix, tc.placeholderPrefix)
+
+			if tc.err == nil {
 				require.NoError(t, err)
+			} else {
+				require.EqualError(t, err, errMissedVariable.Error())
 			}
 
-			if !tc.fail && !reflect.DeepEqual(tc.excpectedMap, envMap) {
-				require.Failf(t, "Maps should be equal", "Maps aren't equal \nExpected: %#v \nActual: %#v", tc.excpectedMap, envMap)
+			if tc.err == nil && !reflect.DeepEqual(tc.excpectedMap, actualMap) {
+				require.Failf(t, "Maps should be equal", "Maps aren't equal \nExpected: %#v \nActual: %#v", tc.excpectedMap, actualMap)
 			}
 		})
 	}
-}
-
-func prepareDotenv(t *testing.T, path string, data []byte) {
-	t.Cleanup(func() {
-		os.Remove(path)
-	})
-
-	f, err := os.Create(path)
-	require.NoError(t, err)
-
-	_, err = f.Write(data)
-	require.NoError(t, err)
 }
 
 func prepareEnv(t *testing.T, env map[string]string) {

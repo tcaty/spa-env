@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	ErrMissedVariable = errors.New("env variable key specified in file, but placeholder missed in environment")
+	errMissedVariable = errors.New("env variable key specified in file, but placeholder missed in environment")
 )
 
 // Form replacement rules by parsing dotenv file and actual env
@@ -26,13 +26,13 @@ func Replace(workdir string, dotenv string, keyPrefix string, placeholderPrefix 
 		return 0, fmt.Errorf("error occured while reading workdir: %v", err)
 	}
 
-	dotenvPath, err := file.Find(workdir, dotenv)
+	dotenvContent, err := readDotenv(workdir, dotenv)
 	if err != nil {
-		return 0, fmt.Errorf("error occured while finding .env file: %v", err)
+		return 0, fmt.Errorf("error occured while reading .env file: %v", err)
 	}
 
 	// form replacement rules
-	rules, err := mapPlaceholderToValue(dotenvPath, keyPrefix, placeholderPrefix)
+	rules, err := mapPlaceholderToValue(dotenvContent, keyPrefix, placeholderPrefix)
 	if err != nil {
 		return 0, fmt.Errorf("error occured while mapping .env file to env: %v", err)
 	}
@@ -77,14 +77,31 @@ func Replace(workdir string, dotenv string, keyPrefix string, placeholderPrefix 
 	return filesUpdated, err
 }
 
-// Map placeholders from .env file to actual environment variables values
-// return error if variable specified in file, but missed in current environment
-func mapPlaceholderToValue(path string, keyPrefix string, placeholderPrefix string) (map[string]string, error) {
-	dotenv, err := godotenv.Read(path)
+// Find dotenv file in workdir by filename and read it
+// return map in form of [key]: [placeholder]
+func readDotenv(workdir string, filename string) (map[string]string, error) {
+	path, err := file.Find(workdir, filename)
+	if err != nil {
+		return nil, fmt.Errorf("error occured while finding .env file: %v", err)
+	}
+
+	content, err := godotenv.Read(path)
 	if err != nil {
 		return nil, fmt.Errorf("error occured while reading %s file: %v", path, err)
 	}
 
+	log.Debug(
+		".env file was found successfully",
+		"path", path,
+	)
+
+	return content, nil
+}
+
+// Map placeholders from .env file to actual environment variables values
+// return error if variable specified in file, but missed in current environment
+func mapPlaceholderToValue(dotenv map[string]string, keyPrefix string, placeholderPrefix string) (map[string]string, error) {
+	var err error
 	res := make(map[string]string)
 
 	for key, placeholder := range dotenv {
@@ -93,7 +110,6 @@ func mapPlaceholderToValue(path string, keyPrefix string, placeholderPrefix stri
 				"Skip variable cause it has no prefix",
 				"key", key,
 				"prefix", keyPrefix,
-				"path", path,
 			)
 			continue
 		}
@@ -103,19 +119,18 @@ func mapPlaceholderToValue(path string, keyPrefix string, placeholderPrefix stri
 		if value == "" {
 			log.Error(
 				"missed variable",
-				ErrMissedVariable,
+				errMissedVariable,
 				"key", key,
 				"placeholder", placeholder,
-				"path", path,
 			)
-			err = ErrMissedVariable
+			err = errMissedVariable
 		}
 
 		res[placeholder] = value
 	}
 
-	if err == ErrMissedVariable {
-		return nil, fmt.Errorf("some variables from %s wasn't found in environment", path)
+	if errors.Is(err, errMissedVariable) {
+		return nil, err
 	}
 
 	return res, nil
