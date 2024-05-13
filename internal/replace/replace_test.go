@@ -148,6 +148,81 @@ func TestMapPlaceholderToValue(t *testing.T) {
 	}
 }
 
+func TestGetenv(t *testing.T) {
+	tcs := []struct {
+		name      string
+		key       string
+		prefix    string
+		actualEnv map[string]string
+		expected  string
+	}{
+		{
+			name: "Without prefix",
+			key:  "API_URL",
+			actualEnv: map[string]string{
+				"API_URL":      "https://api.com/",
+				"SECRET_TOKEN": "12345",
+			},
+			expected: "https://api.com/",
+		},
+		{
+			name:   "With right prefix without suffix",
+			key:    "PLACEHOLDER_API_URL",
+			prefix: "PLACEHOLDER",
+			actualEnv: map[string]string{
+				"PLACEHOLDER_API_URL": "https://wrong.api.com/",
+				"API_URL":             "https://api.com/",
+			},
+			expected: "https://api.com/",
+		},
+		{
+			name:   "With right prefix with suffix",
+			key:    "PLACEHOLDER_API_URL",
+			prefix: "PLACEHOLDER_",
+			actualEnv: map[string]string{
+				"PLACEHOLDER_API_URL": "https://wrong.api.com/",
+				"API_URL":             "https://api.com/",
+			},
+			expected: "https://api.com/",
+		},
+		{
+			name: "Without prefix but key miseed in environment",
+			key:  "API_URL",
+			actualEnv: map[string]string{
+				"SECRET_TOKEN": "12345",
+			},
+			expected: "",
+		},
+		{
+			name: "With wrong prefix",
+			// It is assumed that we want to get API_URL from environment
+			// but there will be nothing deleted from key because it doesn't contain prefix
+			// therefore PLACEHOLDER_API_URL will be returned
+			key:    "PLACEHOLDER_API_URL",
+			prefix: "WRONGPREFIX",
+			actualEnv: map[string]string{
+				"PLACEHOLDER_API_URL": "https://wrong.api.com/",
+				"API_URL":             "https://api.com/",
+			},
+			expected: "https://wrong.api.com/",
+		},
+	}
+
+	for _, tc := range tcs {
+		tc := tc
+		// hide logs
+		log.Init(log.LogLevelDebug, true)
+
+		t.Run(tc.name, func(t *testing.T) {
+			prepareEnv(t, tc.actualEnv)
+
+			value := getenv(tc.key, tc.prefix)
+
+			require.Equal(t, tc.expected, value)
+		})
+	}
+}
+
 func prepareEnv(t *testing.T, env map[string]string) {
 	t.Cleanup(func() {
 		os.Clearenv()
