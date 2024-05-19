@@ -23,6 +23,7 @@ func Execute() {
 // TODO: fix generate tests
 // TODO: show server side variables in generated file
 // TODO: add tests to generate
+// TODO: update README
 
 func init() {
 	rootCmd.AddCommand(replaceCmd)
