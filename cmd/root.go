@@ -20,7 +20,6 @@ func Execute() {
 }
 
 func init() {
-	// TODO: generate - generate .env file for production based on .env.development
-	// TODO: validate - validate code for environment variables usage
 	rootCmd.AddCommand(replaceCmd)
+	rootCmd.AddCommand(generateCmd)
 }
