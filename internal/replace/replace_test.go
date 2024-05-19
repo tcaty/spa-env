@@ -6,7 +6,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/require"
-	"github.com/tcaty/spa-env/internal/log"
+	"github.com/tcaty/spa-env/internal/common/log"
 )
 
 func TestMapPlaceholderToValue(t *testing.T) {

@@ -5,7 +5,8 @@ import (
 	"time"
 
 	"github.com/spf13/cobra"
-	"github.com/tcaty/spa-env/internal/log"
+	"github.com/tcaty/spa-env/internal/common/log"
+	"github.com/tcaty/spa-env/internal/common/utils"
 	"github.com/tcaty/spa-env/internal/replace"
 	"github.com/tcaty/spa-env/pkg/command"
 )
@@ -27,12 +28,16 @@ var replaceCmd = &cobra.Command{
 	Short: "Run replace command",
 	Long:  "This commmand replaces static env values from .env by values from actual environment",
 	Args: func(cmd *cobra.Command, args []string) error {
+		// validate flags
 		if err := command.ValidateForm(replaceFlags.CmdForm); err != nil {
 			return fmt.Errorf("--form validation failed: %v", err)
 		}
 		if err := log.ValidateLogLevel(replaceFlags.LogLevel); err != nil {
 			return fmt.Errorf("--log-level validation failed: %v", err)
 		}
+		// transform flags
+		generateFlags.KeyPrefix = utils.AddSuffix(generateFlags.KeyPrefix, "_")
+		generateFlags.PlaceholderPrefix = utils.AddSuffix(generateFlags.PlaceholderPrefix, "_")
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
