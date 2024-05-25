@@ -33,7 +33,7 @@ var generateCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Init(generateFlags.LogLevel, false)
 
-		err := generate.Generate(
+		path, err := generate.Generate(
 			generateFlags.Workdir,
 			generateFlags.DotenvDev,
 			generateFlags.DotenvProd,
@@ -45,6 +45,11 @@ var generateCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal("error occured while generating .env file", err)
 		}
+
+		log.Info(
+			".env file generated successfully",
+			"path", path,
+		)
 	},
 }
 

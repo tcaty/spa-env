@@ -116,7 +116,7 @@ func TestMapPlaceholderToValue(t *testing.T) {
 	for _, tc := range testCases {
 		tc := tc
 		// hide logs
-		log.Init(log.LogLevelDebug, false)
+		log.Init(log.LogLevelDebug, true)
 
 		t.Run(tc.name, func(t *testing.T) {
 			prepareEnv(t, tc.actualEnv)

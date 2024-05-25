@@ -25,17 +25,17 @@ func Replace(workdir, dotenvProd, keyPrefix, placeholderPrefix string) (int, err
 		return 0, fmt.Errorf("error occured while reading workdir: %v", err)
 	}
 
-	dotenvEntries, err := dotenv.Read(workdir, dotenvProd, keyPrefix, placeholderPrefix)
+	entries, err := dotenv.Read(workdir, dotenvProd, keyPrefix, placeholderPrefix)
 	if err != nil {
 		return 0, fmt.Errorf("error occured while reading .env file: %v", err)
 	}
 
-	if err := validateEntries(dotenvEntries); err != nil {
+	if err := validateEntries(entries); err != nil {
 		return 0, err
 	}
 
 	// form replacement rules
-	rules, err := mapPlaceholderToValue(dotenvEntries)
+	rules, err := mapPlaceholderToValue(entries)
 	if err != nil {
 		return 0, fmt.Errorf("error occured while mapping .env file to env: %v", err)
 	}

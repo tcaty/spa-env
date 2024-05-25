@@ -12,11 +12,11 @@ import (
 var ErrValidationFailed = errors.New(".env entry validation failed")
 
 // .env files
-// <      -- key --     >   <      -- placeholder --     >
-// (<keyPrefix>_)<variable> = (<placeholderPrefix>_)<variable>
+// <        -- key --        >   <        -- placeholder --        >
+// (<keyPrefix>_)<envVariable> = (<placeholderPrefix>_)<envVariable>
 //
 // actual environment
-// <variable> = <value>
+// <envVariable> = <envValue>
 
 type Entry struct {
 	Key               string

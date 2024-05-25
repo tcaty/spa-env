@@ -54,7 +54,7 @@ var replaceCmd = &cobra.Command{
 
 		duration := time.Since(start)
 		log.Info(
-			"Replacement completed successfully",
+			"replacement completed successfully",
 			"duration", duration,
 			"files_updated", filesUpdated,
 		)
