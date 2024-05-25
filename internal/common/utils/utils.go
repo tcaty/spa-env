@@ -11,8 +11,8 @@ import (
 // "str"  -> "str_";
 // "str_" -> "str_";
 func AddSuffix(s string, suffix string) string {
-	if !strings.HasSuffix(s, suffix) {
-		return fmt.Sprintf("%s%s", s, suffix)
+	if strings.HasSuffix(s, suffix) || s == "" {
+		return s
 	}
-	return s
+	return fmt.Sprintf("%s%s", s, suffix)
 }

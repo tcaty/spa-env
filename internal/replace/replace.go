@@ -92,8 +92,8 @@ func validateEntries(entries []dotenv.Entry) error {
 			validationErr = err
 			log.Error(
 				".env entry validation failed", err,
-				"excpected", fmt.Sprintf("%s=%s", entry.Key(), entry.GeneratePlaceholder()),
-				"got", fmt.Sprintf("%s=%s", entry.Key(), entry.Placeholder()),
+				"excpected", fmt.Sprintf("%s=%s", entry.Key, entry.Placeholder()),
+				"got", fmt.Sprintf("%s=%s", entry.Key, entry.Value),
 			)
 		}
 	}
@@ -110,19 +110,19 @@ func mapPlaceholderToValue(entries []dotenv.Entry) (map[string]string, error) {
 		if entry.Skip() {
 			log.Debug(
 				"skip variable cause it has no required prefix",
-				"key", entry.Key(),
+				"key", entry.Key,
 			)
 			continue
 		}
 
-		value := entry.GetEnvValue()
+		value := entry.EnvValue()
 
 		if value == "" {
 			log.Error(
 				"missed variable",
 				errMissedVariable,
-				"key", entry.Key(),
-				"variable", entry.GetEnvVariable(),
+				"key", entry.Key,
+				"variable", entry.EnvVariable(),
 			)
 			err = errMissedVariable
 		}

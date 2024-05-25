@@ -25,9 +25,6 @@ func Read(workdir, filename, keyPrefix, placeholderPrefix string) ([]Entry, erro
 	}
 
 	entries := ParseEntries(content, keyPrefix, placeholderPrefix)
-	if err != nil {
-		return nil, fmt.Errorf("error occured while parsing .env file entries: %v", err)
-	}
 
 	log.Debug(
 		".env file was read successfully",
@@ -92,7 +89,7 @@ func generateContent(entries []Entry, enableComments bool) string {
 		)
 
 		for _, entry := range entries {
-			content = append(content, fmt.Sprintf("# %s", entry.GetEnvVariable()))
+			content = append(content, fmt.Sprintf("# %s", entry.EnvVariable()))
 		}
 	}
 
@@ -104,12 +101,12 @@ func generateContent(entries []Entry, enableComments bool) string {
 		if enableComments {
 			content = append(
 				content,
-				fmt.Sprintf("\n# env -> %s", entry.GetEnvVariable()),
-				fmt.Sprintf("# src -> process.env.%s", entry.Key()),
+				fmt.Sprintf("\n# env -> %s", entry.EnvVariable()),
+				fmt.Sprintf("# src -> process.env.%s", entry.Key),
 			)
 		}
 
-		content = append(content, fmt.Sprintf("%s=%s", entry.Key(), entry.GeneratePlaceholder()))
+		content = append(content, fmt.Sprintf("%s=%s", entry.Key, entry.Placeholder()))
 	}
 
 	return strings.Join(content, "\n")
