@@ -17,22 +17,25 @@ var (
 	errMissedVariable = errors.New("env variable key specified in file, but placeholder missed in environment")
 )
 
-// Form replacement rules by parsing dotenv file and actual env
-// Then recursively walk through files in workdir
-// and replace env variables by formed rules
+// Parse dotenv file, validate parsed entries and form replacement rules
+// Then recursively walk through files in workdir and replace env variables by formed rules
 // Return updated files count and no error if replacement completed successfully
 func Replace(workdir, dotenvProd, keyPrefix, placeholderPrefix string) (int, error) {
 	if _, err := os.Stat(workdir); err != nil {
 		return 0, fmt.Errorf("error occured while reading workdir: %v", err)
 	}
 
-	dotenvContent, err := dotenv.Read(workdir, dotenvProd)
+	dotenvEntries, err := dotenv.Read(workdir, dotenvProd, keyPrefix, placeholderPrefix)
 	if err != nil {
 		return 0, fmt.Errorf("error occured while reading .env file: %v", err)
 	}
 
+	if err := validateEntries(dotenvEntries); err != nil {
+		return 0, err
+	}
+
 	// form replacement rules
-	rules, err := mapPlaceholderToValue(dotenvContent, keyPrefix, placeholderPrefix)
+	rules, err := mapPlaceholderToValue(dotenvEntries)
 	if err != nil {
 		return 0, fmt.Errorf("error occured while mapping .env file to env: %v", err)
 	}
@@ -63,7 +66,7 @@ func Replace(workdir, dotenvProd, keyPrefix, placeholderPrefix string) (int, err
 			filesUpdated += 1
 			for placeholder, value := range appliedRules {
 				log.Debug(
-					"Successful replacement",
+					"successful replacement",
 					"path", path,
 					"placeholder", placeholder,
 					"value", value,
@@ -77,35 +80,54 @@ func Replace(workdir, dotenvProd, keyPrefix, placeholderPrefix string) (int, err
 	return filesUpdated, err
 }
 
+// Validate .env entries
+func validateEntries(entries []dotenv.Entry) error {
+	var validationErr error
+	for _, entry := range entries {
+		if entry.Skip() {
+			continue
+		}
+
+		if err := entry.Validate(); err != nil {
+			validationErr = err
+			log.Error(
+				".env entry validation failed", err,
+				"excpected", fmt.Sprintf("%s=%s", entry.Key(), entry.GeneratePlaceholder()),
+				"got", fmt.Sprintf("%s=%s", entry.Key(), entry.Placeholder()),
+			)
+		}
+	}
+	return validationErr
+}
+
 // Map placeholders from .env file to actual environment variables values
 // return error if variable specified in file, but missed in current environment
-func mapPlaceholderToValue(dotenv map[string]string, keyPrefix string, placeholderPrefix string) (map[string]string, error) {
+func mapPlaceholderToValue(entries []dotenv.Entry) (map[string]string, error) {
 	var err error
 	res := make(map[string]string)
 
-	for key, placeholder := range dotenv {
-		if !strings.HasPrefix(key, keyPrefix) {
+	for _, entry := range entries {
+		if entry.Skip() {
 			log.Debug(
-				"skip variable cause it has no prefix",
-				"key", key,
-				"prefix", keyPrefix,
+				"skip variable cause it has no required prefix",
+				"key", entry.Key(),
 			)
 			continue
 		}
 
-		value := getenv(placeholder, placeholderPrefix)
+		value := entry.GetEnvValue()
 
 		if value == "" {
 			log.Error(
 				"missed variable",
 				errMissedVariable,
-				"key", key,
-				"placeholder", placeholder,
+				"key", entry.Key(),
+				"variable", entry.GetEnvVariable(),
 			)
 			err = errMissedVariable
 		}
 
-		res[placeholder] = value
+		res[entry.Placeholder()] = value
 	}
 
 	if errors.Is(err, errMissedVariable) {
@@ -113,18 +135,4 @@ func mapPlaceholderToValue(dotenv map[string]string, keyPrefix string, placehold
 	}
 
 	return res, nil
-}
-
-// Find environment variable without prefix by key with prefix
-// For example:
-// key := PLACEHOLDER_TOKEN, prefix := PLACEHOLDER -> value from env variable TOKEN
-// key := PLACEHOLDER_TOKEN, prefix := "" -> value from env variable PLACEHOLDER_TOKEN
-func getenv(key string, prefix string) string {
-	if prefix == "" {
-		return os.Getenv(key)
-	}
-
-	key = strings.TrimPrefix(key, prefix)
-
-	return os.Getenv(key)
 }

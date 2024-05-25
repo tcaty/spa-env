@@ -5,7 +5,6 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/tcaty/spa-env/internal/common/log"
-	"github.com/tcaty/spa-env/internal/common/utils"
 	"github.com/tcaty/spa-env/internal/generate"
 )
 
@@ -26,18 +25,13 @@ var generateCmd = &cobra.Command{
 	Short: "Run generate command",
 	Long:  "Generate .env file with placeholders for production mode based on development .env file",
 	Args: func(cmd *cobra.Command, args []string) error {
-		// validate flags
 		if err := log.ValidateLogLevel(generateFlags.LogLevel); err != nil {
 			return fmt.Errorf("--log-level validation failed: %v", err)
 		}
-		// transform flags
-		generateFlags.KeyPrefix = utils.AddSuffix(generateFlags.KeyPrefix, "_")
-		generateFlags.PlaceholderPrefix = utils.AddSuffix(generateFlags.PlaceholderPrefix, "_")
 		return nil
 	},
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Init(generateFlags.LogLevel, false)
-		fmt.Println(generateFlags.EnableComments)
 
 		err := generate.Generate(
 			generateFlags.Workdir,

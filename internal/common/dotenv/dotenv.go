@@ -13,7 +13,7 @@ import (
 
 // Find dotenv file in workdir by filename and read it
 // return map in form of [key]: [placeholder]
-func Read(workdir string, filename string) (map[string]string, error) {
+func Read(workdir, filename, keyPrefix, placeholderPrefix string) ([]Entry, error) {
 	path, err := file.Find(workdir, filename)
 	if err != nil {
 		return nil, fmt.Errorf("error occured while finding .env file: %v", err)
@@ -24,19 +24,37 @@ func Read(workdir string, filename string) (map[string]string, error) {
 		return nil, fmt.Errorf("error occured while reading %s file: %v", path, err)
 	}
 
+	entries := ParseEntries(content, keyPrefix, placeholderPrefix)
+	if err != nil {
+		return nil, fmt.Errorf("error occured while parsing .env file entries: %v", err)
+	}
+
 	log.Debug(
-		".env file was found successfully",
+		".env file was read successfully",
 		"path", path,
 	)
 
-	return content, nil
+	return entries, nil
 }
 
+func ParseEntries(dotenvContent map[string]string, keyPrefix, placeholderPrefix string) []Entry {
+	// TODO: optimize
+	entries := make([]Entry, 0)
+
+	for key, value := range dotenvContent {
+		entry := NewEntry(key, value, keyPrefix, placeholderPrefix)
+		entries = append(entries, entry)
+	}
+
+	return entries
+}
+
+// TODO: move this one to pkg/file/file.go, replace entries and
 // Find dotenv file in workdir by filename and write envMap there
-func Write(envMap map[string]string, workdir, filename, placeholderPrefix string, enableComments bool) error {
+func Write(workdir, filename string, entries []Entry, enableComments bool) error {
 	path := fmt.Sprintf("%s%s", utils.AddSuffix(workdir, "/"), filename)
 
-	content := generateContent(envMap, placeholderPrefix, enableComments)
+	content := generateContent(entries, enableComments)
 	file, err := os.Create(path)
 	if err != nil {
 		return err
@@ -61,7 +79,8 @@ func Write(envMap map[string]string, workdir, filename, placeholderPrefix string
 	return nil
 }
 
-func generateContent(envMap map[string]string, placeholderPrefix string, enableComments bool) string {
+// TODO: move this one to internal/generate/generate.go as a core logic
+func generateContent(entries []Entry, enableComments bool) string {
 	content := make([]string, 0)
 
 	if enableComments {
@@ -72,20 +91,25 @@ func generateContent(envMap map[string]string, placeholderPrefix string, enableC
 			"#",
 		)
 
-		for _, v := range envMap {
-			content = append(content, fmt.Sprintf("# %s", strings.TrimPrefix(v, placeholderPrefix)))
+		for _, entry := range entries {
+			content = append(content, fmt.Sprintf("# %s", entry.GetEnvVariable()))
 		}
 	}
 
-	for k, v := range envMap {
+	for _, entry := range entries {
+		if entry.Skip() {
+			continue
+		}
+
 		if enableComments {
 			content = append(
 				content,
-				fmt.Sprintf("\n# env -> %s", strings.TrimPrefix(v, placeholderPrefix)),
-				fmt.Sprintf("# src -> process.env.%s", k),
+				fmt.Sprintf("\n# env -> %s", entry.GetEnvVariable()),
+				fmt.Sprintf("# src -> process.env.%s", entry.Key()),
 			)
 		}
-		content = append(content, fmt.Sprintf("%s=%s", k, v))
+
+		content = append(content, fmt.Sprintf("%s=%s", entry.Key(), entry.GeneratePlaceholder()))
 	}
 
 	return strings.Join(content, "\n")
