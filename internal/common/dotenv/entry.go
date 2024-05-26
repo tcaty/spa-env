@@ -20,15 +20,15 @@ var ErrValidationFailed = errors.New(".env entry validation failed")
 // ** CORE TERMS **
 //
 // Place: .env files
-// <        -- key --        >   <     -- value/placeholder --     >
-// (<keyPrefix>_)<envVariable> = (<placeholderPrefix>_)<envVariable>
+// <        -- Key --        >   <     -- Value/Placeholder --     >
+// (<keyPrefix>_)<EnvVariable> = (<placeholderPrefix>_)<EnvVariable>
 // ! Understand distinction between value and placehodler:
 // value - not validated value, that was just parsed from .env file
 // it might has some random value or already has a placeholder.
 // placeholder - validated value that corresponds particular format above.
 //
 // Place: actual environment
-// <envVariable> = <envValue>
+// <EnvVariable> = <EnvValue>
 //
 // **
 type Entry struct {
