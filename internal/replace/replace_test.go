@@ -99,7 +99,7 @@ func TestMapPlaceholderToValue(t *testing.T) {
 		},
 		{
 			name:      "Invalid case with missed variable in actual env without prefixes",
-			keyPrefix: "VITE_",
+			keyPrefix: "VITE",
 			dotenvContent: map[string]string{
 				"VITE_API_URL":      "API_URL",
 				"VITE_SECRET_TOKEN": "SECRET_TOKEN",

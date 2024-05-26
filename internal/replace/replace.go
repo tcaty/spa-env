@@ -14,7 +14,7 @@ import (
 )
 
 var (
-	errMissedVariable = errors.New("env variable key specified in file, but placeholder missed in environment")
+	errMissedVariable = errors.New("key is specified in .env file, but environment variable is missed")
 )
 
 // Parse dotenv file, validate parsed entries and form replacement rules

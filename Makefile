@@ -38,6 +38,7 @@ replace-react:
 	go run main.go replace \
 		--workdir ${REACT}/dist \
 		--dotenv .env.production \
+		--key-prefix VITE \
 		--placeholder-prefix PLACEHOLDER \
 		--cmd "echo react" \
 		--log-level DEBUG
@@ -61,4 +62,5 @@ generate-react:
 		--dotenv-prod .env.production \
 		--key-prefix VITE \
 		--placeholder-prefix PLACEHOLDER_ \
+		--enable-comments \
 		--log-level DEBUG

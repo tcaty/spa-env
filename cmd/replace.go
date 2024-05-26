@@ -38,8 +38,14 @@ var replaceCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Init(replaceFlags.LogLevel, false)
 
+		log.Debug(
+			"prefixes are initialized",
+			"key_prefix", replaceFlags.KeyPrefix,
+			"placeholder_prefix", replaceFlags.PlaceholderPrefix,
+		)
+
 		start := time.Now()
-		log.Info("Starting environment variables replacement...")
+		log.Info("starting environment variables replacement...")
 
 		filesUpdated, err := replace.Replace(
 			replaceFlags.Workdir,

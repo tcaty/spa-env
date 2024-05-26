@@ -33,6 +33,14 @@ var generateCmd = &cobra.Command{
 	Run: func(cmd *cobra.Command, args []string) {
 		log.Init(generateFlags.LogLevel, false)
 
+		log.Debug(
+			"prefixes are initialized",
+			"key_prefix", generateFlags.KeyPrefix,
+			"placeholder_prefix", generateFlags.PlaceholderPrefix,
+		)
+
+		log.Info("starting generate .env file...")
+
 		path, err := generate.Generate(
 			generateFlags.Workdir,
 			generateFlags.DotenvDev,
