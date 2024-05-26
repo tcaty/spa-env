@@ -80,7 +80,9 @@ func Replace(workdir, dotenvProd, keyPrefix, placeholderPrefix string) (int, err
 	return filesUpdated, err
 }
 
-// Validate .env entries
+// Validate .env entries.
+// Return error and log all variables with wrong format
+// in case of failed validation.
 func validateEntries(entries []dotenv.Entry) error {
 	var validationErr error
 	for _, entry := range entries {

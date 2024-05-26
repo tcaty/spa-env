@@ -10,8 +10,7 @@ import (
 	"github.com/tcaty/spa-env/pkg/file"
 )
 
-// Find dotenv file in workdir by filename and read it
-// return map in form of [key]: [placeholder]
+// Find dotenv file in workdir by filename and parse it
 func Read(workdir, filename, keyPrefix, placeholderPrefix string) ([]Entry, error) {
 	path, err := file.Find(workdir, filename)
 	if err != nil {
@@ -33,6 +32,7 @@ func Read(workdir, filename, keyPrefix, placeholderPrefix string) ([]Entry, erro
 	return entries, nil
 }
 
+// Parse []dotenv.Entry from .env file content
 func ParseEntries(dotenvContent map[string]string, keyPrefix, placeholderPrefix string) []Entry {
 	entries := make([]Entry, 0, len(dotenvContent))
 
