@@ -1,7 +1,9 @@
 package dotenv
 
 import (
+	"cmp"
 	"fmt"
+	"slices"
 
 	"github.com/joho/godotenv"
 	"github.com/tcaty/spa-env/internal/common/log"
@@ -31,7 +33,6 @@ func Read(workdir, filename, keyPrefix, placeholderPrefix string) ([]Entry, erro
 	return entries, nil
 }
 
-// TODO: sort in alphabetic order
 func ParseEntries(dotenvContent map[string]string, keyPrefix, placeholderPrefix string) []Entry {
 	entries := make([]Entry, 0, len(dotenvContent))
 
@@ -39,6 +40,11 @@ func ParseEntries(dotenvContent map[string]string, keyPrefix, placeholderPrefix 
 		entry := NewEntry(key, value, keyPrefix, placeholderPrefix)
 		entries = append(entries, entry)
 	}
+
+	// sort alphabetically
+	slices.SortFunc(entries, func(a, b Entry) int {
+		return cmp.Compare(a.Key, b.Key)
+	})
 
 	return entries
 }
