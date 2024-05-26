@@ -22,7 +22,7 @@ So, the main idea is that variables that refer on environment variables are repl
 
 ## Suggested workflow
 1. Generate `.env.production` file based on `.env.development` file via [cmd `generate`](#cmd-generate).
-2. Use [cmd `replace`](#cmd-replace) in `Dockerfile` entrypoint.
+2. Use [cmd `replace`](#cmd-replace) in `Dockerfile` entrypoint in order to update environment variables during container recreations.
 3. Copy and paste environment variables list from generated `.env.production` to `docker-compose.yml`.
 4. Fill environment variables values.
 
