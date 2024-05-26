@@ -38,10 +38,16 @@ ENTRYPOINT [ \
     "--workdir", "/usr/src/react/dist", \
     # specify name of .env file for production mode
     "--dotenv", ".env.production", \
+    # specify environment variables prefix which will be replaced
+    # variables without this prefix won't be affected
+    "--key-prefix", "VITE", \
+    # specify placeholder prefix to replace
+    # values without this prefix won't be replaced
+    "--placeholder-prefix", "PLACEHOLDER", \
     # specify command which will be run after successfull replacement
     "--cmd", "npx serve -s dist -l tcp://$HOSTNAME:$PORT", \
     # specify in which form command will be run
     # as you can see, command above uses environment variables $HOSTNAME and $PORT
     # therefore, it must be run in shell form (by default command runs in exec form)
-    "--form", "shell" \
+    "--cmd-form", "shell" \
 ]

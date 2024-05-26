@@ -20,23 +20,47 @@ restore:
 	rm -rf ${REACT}/dist && \
 	cp -r ${REACT}/dist.backup ${REACT}/dist 
 
-.PHONY: nextjs
-nextjs:
+.PHONY: replace-nextjs
+replace-nextjs:
 	export $(shell grep -v '^#' ${NEXTJS}/.env | xargs -d '\n') && \
 	go run main.go replace \
 		--workdir ${NEXTJS}/.next \
 		--dotenv .env.production \
-		--prefix NEXT_PUBLIC \
+		--key-prefix NEXT_PUBLIC \
+		--placeholder-prefix PLACEHOLDER \
 		--cmd "while true; do echo 1; sleep 1; done" \
-		--form shell \
+		--cmd-form shell \
 		--log-level DEBUG
 
 .PHONY: react
-react:
+replace-react:
 	export $(shell grep -v '^#' ${REACT}/.env | xargs -d '\n') && \
 	go run main.go replace \
 		--workdir ${REACT}/dist \
 		--dotenv .env.production \
+		--key-prefix VITE \
+		--placeholder-prefix PLACEHOLDER \
 		--cmd "echo react" \
 		--log-level DEBUG
 	
+.PHONY: generate-nextjs
+generate-nextjs:
+	go run main.go generate \
+		--workdir ${NEXTJS} \
+		--dotenv-dev .env.development \
+		--dotenv-prod .env.production \
+		--key-prefix NEXT_PUBLIC \
+		--placeholder-prefix PLACEHOLDER \
+		--enable-comments \
+		--log-level DEBUG
+	
+.PHONY: generate-react
+generate-react:
+	go run main.go generate \
+		--workdir ${REACT} \
+		--dotenv-dev .env.development \
+		--dotenv-prod .env.production \
+		--key-prefix VITE \
+		--placeholder-prefix PLACEHOLDER_ \
+		--enable-comments \
+		--log-level DEBUG

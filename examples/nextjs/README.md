@@ -1,10 +1,10 @@
 # NextJS example
 
 This is simple example. Please, pay attention to these files:
-* `.env.development` - environment variables for development mode. There are `key=value` entries.
-* `.env.production` - environment variable for production mode. There are `key=placeholder` entries.
+* `.env.development` - environment variables for development mode.
+* `.env.production` - environment variables for production mode. This file was generated automatically.
 * `Dockerfile` - the place to use `spa-env`.
-* `docker-compose.yml` - the place to configure environment variables `placeholder=value`.
+* `docker-compose.yml` - the place to configure environment variables. Here you can see `env` usage, it is for easy development. You should use keyword `environment`.
 
 ## Running
 
@@ -30,4 +30,4 @@ There are three environment variables in this example:
 * `NEXT_PUBLIC_API_URL` - client side variable
 * `NEXT_PUBLIC_SECRET_TOKEN` - client side variable
 
-As it's known, server side code has access to environment variables during node runtime without any problems. So, we must just skip server side variables. To do this, there is a specified flag `--prefifx=NEXT_PUBLIC` in `Dockerfile`, variables without this prefix will be skipped. 
+As it's known, server side code has access to environment variables during node runtime without any problems. So, we must just skip server side variables. To do this, there is a specified flag `--key-prefifx=NEXT_PUBLIC` in `Dockerfile`, variables without this prefix will be skipped. 

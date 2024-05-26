@@ -6,8 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/tcaty/spa-env/internal/log"
 )
 
 // Find file by workdir and filename substring
@@ -40,41 +38,37 @@ func Find(wordkir string, filename string) (string, error) {
 	return path, nil
 }
 
-// Replace placeholder by value in file located on specified path
-// Return true and no error if file was successfully updated
-func ReplaceContent(path string, rules map[string]string) (bool, error) {
+// Replace file content by provided rules
+// Return appliedRules and no error if file was successfully updated
+func ReplaceContent(path string, rules map[string]string) (map[string]string, error) {
 	bytes, err := os.ReadFile(path)
 	if err != nil {
-		return false, fmt.Errorf("error occured while reading file: %v", err)
+		return nil, fmt.Errorf("error occured while reading file: %v", err)
 	}
 
+	appliedRules := make(map[string]string)
 	oldContent := string(bytes)
 	newContent := oldContent
 
-	for placeholder, value := range rules {
+	for old, new := range rules {
 		// skip if replacement isn't needed
-		if !strings.Contains(newContent, placeholder) {
+		if !strings.Contains(newContent, old) {
 			continue
 		}
 
-		newContent = strings.ReplaceAll(newContent, placeholder, value)
-
-		log.Debug(
-			"successful replacement",
-			"path", path,
-			"placeholder", placeholder,
-			"value", value,
-		)
+		newContent = strings.ReplaceAll(newContent, old, new)
+		// mark current rule as applied
+		appliedRules[old] = new
 	}
 
 	// prevent writing if there were no changes in content
 	if oldContent == newContent {
-		return false, nil
+		return nil, nil
 	}
 
 	if err := os.WriteFile(path, []byte(newContent), 0); err != nil {
-		return false, fmt.Errorf("error occured while writing file: %v", err)
+		return nil, fmt.Errorf("error occured while writing file: %v", err)
 	}
 
-	return true, nil
+	return appliedRules, nil
 }

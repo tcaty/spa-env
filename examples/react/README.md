@@ -1,10 +1,10 @@
 # React + TypeScript + Vite example
 
 This is simple example. Please, pay attention to these files:
-* `.env.development` - environment variables for development mode. There are `key=value` entries.
-* `.env.production` - environment variable for production mode. There are `key=placeholder` entries.
+* `.env.development` - environment variables for development mode.
+* `.env.production` - environment variables for production mode. This file was generated automatically.
 * `Dockerfile` - the place to use `spa-env`.
-* `docker-compose.yml` - the place to configure environment variables `placeholder=value`.
+* `docker-compose.yml` - the place to configure environment variables. Here you can see `env` usage, it is for easy development. You should use keyword `environment`.
 
 ## Running
 
@@ -28,5 +28,3 @@ You could find detailed description of `spa-env` usage in `Dockerfile`.
 There are two environment variables in this example:
 * `VITE_API_URL`
 * `VITE_SECRET_TOKEN`
-
-All of them will be replaced by values from `docker-compose.yml`, cause flag `--prefix` isn't specified for `spa-env`.
